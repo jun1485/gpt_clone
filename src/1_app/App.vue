@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { TopAppBar } from "../3_widgets/navigation";
+import "@/1_app/globals.scss";
 </script>
 
 <template>
   <div>
-    <TopAppBar />
+    <router-view></router-view>
   </div>
 </template>
 
