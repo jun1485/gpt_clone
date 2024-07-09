@@ -1,1 +1,1 @@
-export { default as TopAppBar } from "./TopAppBar.vue";
+export { default as SideBar } from "./SideBar.vue";

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { TopAppBar } from "../3_widgets/navigation";
+import { SideBar } from "../3_widgets/navigation";
 </script>
 
 <template>
   <div>
-    <TopAppBar />
+    <SideBar />
   </div>
 </template>
 
