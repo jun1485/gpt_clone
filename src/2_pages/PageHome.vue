@@ -3,8 +3,10 @@ import { SideBar } from "../3_widgets/navigation";
 </script>
 
 <template>
-  <div>
+  <div class="flex">
     <SideBar />
+
+    <span class="text-black">asd</span>
   </div>
 </template>
 
