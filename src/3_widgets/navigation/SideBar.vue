@@ -7,7 +7,9 @@ const { data: messages } = useMessageQuery();
 </script>
 
 <template>
-  <div class="fixed left-0 flex flex-col bg-black/90 h-[100svh] w-72 p-3">
+  <div
+    class="sticky top-0 left-0 flex flex-col bg-black/90 h-[100svh] w-72 p-3"
+  >
     <div class="flex justify-center gap-3 h-10">
       <h1 class="text-lg">Jun's</h1>
     </div>
