@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { SideBar } from "../3_widgets/navigation";
+import { ChatContents, SideBar } from "../3_widgets/navigation";
+import { useMessageQuery } from "../5_entities/message/api/query";
+
+const { data: chatData } = useMessageQuery();
 </script>
 
 <template>
   <div class="flex">
-    <SideBar />
+    <SideBar :chatData="chatData" />
 
-    <span class="text-black">asd</span>
+    <ChatContents :chatData="chatData" />
   </div>
 </template>
 
