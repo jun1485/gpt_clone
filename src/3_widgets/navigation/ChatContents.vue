@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { toggleDarkMode } from "../../6_shared/theme/theme";
+import { useThemeStore } from "../../6_shared/theme/composable/useTheme";
 
 defineProps<{
   chatData: any;
 }>();
+
+const themeStore = useThemeStore();
 </script>
 
 <template>
   <div class="px-6 py-4">
-    <h1 class="text-black text-xl">My GPT</h1>
+    <h1 class="text-xl">My GPT</h1>
 
-    <div @click="toggleDarkMode" class="">asdadssda</div>
+    <div @click="themeStore.toggleDarkMode" class="">asdadssda</div>
     asdsdasd
   </div>
 </template>

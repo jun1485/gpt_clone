@@ -11,3 +11,15 @@ export const useMessageQuery = (): UseQueryReturnType<MessageType[], unknown> =>
     queryKey: ["message"],
     queryFn: getMessages,
   });
+
+const getSelectedChat = async (id: string) => {
+  return dummyMessages.find((message) => message.id === Number(id));
+};
+
+export const useSelectedChatQuery = (
+  id: string
+): UseQueryReturnType<MessageType, unknown> =>
+  useQuery({
+    queryKey: ["message", id],
+    queryFn: () => getSelectedChat(id),
+  });
