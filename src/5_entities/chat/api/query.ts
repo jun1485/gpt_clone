@@ -8,18 +8,18 @@ const getChats = async () => {
 
 export const useChatQuery = (): UseQueryReturnType<ChatType[], unknown> =>
   useQuery({
-    queryKey: ["Chat"],
+    queryKey: ["chats"],
     queryFn: getChats,
   });
 
-const getSelectedChat = async (id: string) => {
-  return dummyChats.find((message) => message.id === Number(id));
+const getSelectedChat = async (id: number): Promise<ChatType | undefined> => {
+  return dummyChats.find((chat) => chat.id === id);
 };
 
 export const useSelectedChatQuery = (
-  id: string
+  id: number
 ): UseQueryReturnType<ChatType, unknown> =>
   useQuery({
-    queryKey: ["message", id],
+    queryKey: ["chat", id],
     queryFn: () => getSelectedChat(id),
   });

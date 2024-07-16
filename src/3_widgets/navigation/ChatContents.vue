@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { useThemeStore } from "../../6_shared/theme/composable/useTheme";
+import { useSelectedChatQuery } from "@/5_entities/chat/api/query";
 
-defineProps<{
+const props = defineProps<{
   chatData: any;
 }>();
 
-const themeStore = useThemeStore();
+const { data: selectedChatData } = useSelectedChatQuery(props.chatdata.id);
 </script>
 
 <template>
-  <div class="px-6 py-4">
+  <div class="flex flex-col gap-3 px-6 py-4 w-full">
     <h1 class="text-xl">My GPT</h1>
 
-    <div @click="themeStore.toggleDarkMode" class="">asdadssda</div>
-    asdsdasd
+    <div class="mx-auto">
+      {{ selectedChatData?.content }}
+    </div>
   </div>
 </template>
 
