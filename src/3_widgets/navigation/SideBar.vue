@@ -3,7 +3,14 @@ defineProps<{
   chatData: any;
 }>();
 
+const emit = defineEmits(["selectChat"]);
 // TODO: messages mutation
+
+const selectChat = (chatId: string) => {
+  console.log(chatId);
+
+  emit("selectChat", chatId);
+};
 </script>
 
 <template>
@@ -17,6 +24,7 @@ defineProps<{
     <div
       v-for="chat in chatData"
       :key="chat.id"
+      @click="selectChat(chat.id)"
       class="p-2 bg-transparent hover:bg-gray-400/10 rounded-md cursor-pointer text-white"
     >
       {{ chat.title }}

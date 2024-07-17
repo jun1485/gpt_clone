@@ -21,5 +21,5 @@ export const useSelectedChatQuery = (
 ): UseQueryReturnType<ChatType, unknown> =>
   useQuery({
     queryKey: ["chat", id],
-    queryFn: () => getSelectedChat(id),
+    queryFn: () => (id ? getSelectedChat(id) : Promise.resolve(null)),
   });
