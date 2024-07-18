@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { ChatContents, SideBar } from "@/3_widgets/navigation";
-import {
-  useChatQuery,
-  useSelectedChatQuery,
-} from "@/5_entities/chat/api/query";
+import { useChatQuery } from "@/5_entities/chat/api/query";
 import { ref } from "vue";
 
 const { data: chatData } = useChatQuery();
-// const { data: selectedChatData } = useSelectedChatQuery(1);
 
-const selectedChatID = ref<string>();
+const selectedChatID = ref<number>();
 
-const chatSelected = (chatId: string) => {
+const chatSelected = (chatId: number) => {
   selectedChatID.value = chatId;
 };
 </script>

@@ -13,6 +13,8 @@ export const useChatQuery = (): UseQueryReturnType<ChatType[], unknown> =>
   });
 
 const getSelectedChat = async (id: number): Promise<ChatType | undefined> => {
+  console.log("getSelectedChat Query ->", id);
+
   return dummyChats.find((chat) => chat.id === id);
 };
 
@@ -21,5 +23,5 @@ export const useSelectedChatQuery = (
 ): UseQueryReturnType<ChatType, unknown> =>
   useQuery({
     queryKey: ["chat", id],
-    queryFn: () => (id ? getSelectedChat(id) : Promise.resolve(null)),
+    queryFn: () => getSelectedChat(id),
   });

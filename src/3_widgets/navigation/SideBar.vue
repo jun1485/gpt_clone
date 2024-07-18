@@ -6,9 +6,7 @@ defineProps<{
 const emit = defineEmits(["selectChat"]);
 // TODO: messages mutation
 
-const selectChat = (chatId: string) => {
-  console.log(chatId);
-
+const selectChat = (chatId: number) => {
   emit("selectChat", chatId);
 };
 </script>
