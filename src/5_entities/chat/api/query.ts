@@ -1,6 +1,7 @@
 import { useQuery, UseQueryReturnType } from "@tanstack/vue-query";
 import { dummyChats } from "../model/dummyChats";
 import { ChatType } from "../model/type";
+import { computed } from "vue";
 
 const getChats = async () => {
   return dummyChats;
@@ -12,16 +13,13 @@ export const useChatQuery = (): UseQueryReturnType<ChatType[], unknown> =>
     queryFn: getChats,
   });
 
-const getSelectedChat = async (id: number): Promise<ChatType | undefined> => {
-  console.log("getSelectedChat Query ->", id);
-
+const getSelectedChat = async (id: number) => {
   return dummyChats.find((chat) => chat.id === id);
 };
 
-export const useSelectedChatQuery = (
-  id: number
-): UseQueryReturnType<ChatType, unknown> =>
-  useQuery({
+export const useSelectedChatQuery = (id: ReturnType<typeof computed>) => {
+  return useQuery({
     queryKey: ["chat", id],
-    queryFn: () => getSelectedChat(id),
+    queryFn: () => getSelectedChat(id.value as number),
   });
+};

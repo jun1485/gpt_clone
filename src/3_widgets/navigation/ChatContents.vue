@@ -1,25 +1,13 @@
 <script setup lang="ts">
 import { useSelectedChatQuery } from "@/5_entities/chat/api/query";
-import { ref, watch } from "vue";
+import { computed } from "vue";
 
 const props = defineProps<{
-  chatData: any;
+  chatID: number | null;
 }>();
 
-const selectedChatID = ref<number>(props.chatData?.id ?? 1);
-
-const { data: selectedChatData, refetch } = useSelectedChatQuery(
-  selectedChatID.value
-);
-
-watch(
-  () => props.chatData,
-  (newChatData) => {
-    console.log("newChatData", newChatData);
-    selectedChatID.value = newChatData?.id;
-    refetch();
-  },
-  { immediate: true }
+const { data: selectedChatData } = useSelectedChatQuery(
+  computed(() => props.chatID)
 );
 </script>
 
@@ -28,10 +16,6 @@ watch(
     <h1 class="text-xl">My GPT</h1>
 
     <div class="mx-auto">
-      {{ props.chatData }},
-      <br />
-      selectedID -> {{ selectedChatID }},
-      <br />
       {{ selectedChatData?.content }}
     </div>
   </div>

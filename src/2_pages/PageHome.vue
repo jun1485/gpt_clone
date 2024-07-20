@@ -5,7 +5,7 @@ import { ref } from "vue";
 
 const { data: chatData } = useChatQuery();
 
-const selectedChatID = ref<number>();
+const selectedChatID = ref<number | null>(null);
 
 const chatSelected = (chatId: number) => {
   selectedChatID.value = chatId;
@@ -16,7 +16,7 @@ const chatSelected = (chatId: number) => {
   <div class="flex">
     <SideBar :chatData="chatData" @select-chat="chatSelected" />
 
-    <ChatContents :chatData="selectedChatID ?? 1" />
+    <ChatContents :chatID="selectedChatID" />
   </div>
 </template>
 
