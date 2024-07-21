@@ -20,6 +20,9 @@ const getSelectedChat = async (id: number) => {
 export const useSelectedChatQuery = (id: ReturnType<typeof computed>) => {
   return useQuery({
     queryKey: ["chat", id],
-    queryFn: () => getSelectedChat(id.value as number),
+    queryFn: () => {
+      if (id.value !== null) return getSelectedChat(id.value as number);
+      return Promise.resolve(null);
+    },
   });
 };
