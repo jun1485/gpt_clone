@@ -3,12 +3,12 @@ import { useSelectedChatQuery } from "@/5_entities/chat/api/query";
 import { computed } from "vue";
 
 const props = defineProps<{
-  chatID: number | null;
+  chatID: any;
 }>();
 
-const { data: selectedChatData } = useSelectedChatQuery(
-  computed(() => props.chatID)
-);
+const selectedChatID = computed(() => props.chatID);
+
+const { data: selectedChatData } = useSelectedChatQuery(selectedChatID);
 </script>
 
 <template>
