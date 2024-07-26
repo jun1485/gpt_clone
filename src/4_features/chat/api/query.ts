@@ -1,5 +1,5 @@
 import { useQuery, UseQueryReturnType } from "@tanstack/vue-query";
-import { ChatType } from "../model/type";
+import { ChatType } from "../../../5_entities/chat/model/type";
 import { ComputedRef } from "vue";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 import { db } from "@/server/firebase";

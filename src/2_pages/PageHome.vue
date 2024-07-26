@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ChatContents, SideBar } from "@/3_widgets/navigation";
-import { useChatQuery } from "@/5_entities/chat/api/query";
+import { useChatQuery } from "@/4_features/chat/api/query";
+
 import { ref } from "vue";
 
 const { data: chatData } = useChatQuery();
