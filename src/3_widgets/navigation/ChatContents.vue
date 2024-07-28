@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSelectedChatQuery } from "@/5_entities/chat/api/query";
+import { useSelectedChatQuery } from "@/4_features/chat/api/query";
 import { computed } from "vue";
 
 const props = defineProps<{
