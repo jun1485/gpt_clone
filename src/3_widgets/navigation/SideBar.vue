@@ -6,7 +6,7 @@ defineProps<{
 const emit = defineEmits(["selectChat"]);
 // TODO: messages mutation
 
-const selectChat = (chatId: number) => {
+const selectChat = (chatId: number | null) => {
   emit("selectChat", chatId);
 };
 </script>
@@ -27,6 +27,15 @@ const selectChat = (chatId: number) => {
     >
       {{ chat.title }}
     </div>
+
+    <div class="grow" />
+
+    <button
+      @click="selectChat(null)"
+      class="p-2 bg-gray-400/40 rounded-md text-white"
+    >
+      새 채팅
+    </button>
   </div>
 </template>
 

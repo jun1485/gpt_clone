@@ -15,7 +15,7 @@ export const getDBChats = async (): Promise<ChatType[]> => {
 
 // 특정 채팅 데이터를 가져오는 함수
 export const getDBSelectedChat = async (
-  id: number
+  id: number | null
 ): Promise<ChatType | null> => {
   if (id === null) return null;
 

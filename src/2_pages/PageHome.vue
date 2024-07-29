@@ -8,7 +8,7 @@ const { data: chatData } = useChatQuery();
 
 const selectedChatID = ref<number | null>(null);
 
-const chatSelected = (chatId: number) => {
+const chatSelected = (chatId: number | null) => {
   selectedChatID.value = chatId;
 };
 
