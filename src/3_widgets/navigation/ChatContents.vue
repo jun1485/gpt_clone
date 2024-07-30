@@ -21,6 +21,16 @@ const { data: selectedChatData } = useSelectedChatQuery(selectedChatID);
     <div class="mx-auto">
       {{ selectedChatData?.content }}
     </div>
+
+    <div class="grow" />
+
+    <div class="h-16">
+      <input
+        type="text"
+        class="w-full h-14 p-2 border border-gray-400 rounded-md"
+        placeholder="메시지를 입력하세요"
+      />
+    </div>
   </div>
 </template>
 
