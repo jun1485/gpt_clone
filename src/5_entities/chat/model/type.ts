@@ -1,5 +1,5 @@
 export type ChatType = {
-  id: number;
+  id: string;
   title: string;
   content: string;
 };

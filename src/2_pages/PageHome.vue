@@ -6,9 +6,9 @@ import { ref, watch } from "vue";
 
 const { data: chatData } = useChatQuery();
 
-const selectedChatID = ref<number | null>(null);
+const selectedChatID = ref<string | null>(null);
 
-const chatSelected = (chatId: number | null) => {
+const chatSelected = (chatId: string | null) => {
   selectedChatID.value = chatId;
 };
 

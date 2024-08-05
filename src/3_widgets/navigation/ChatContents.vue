@@ -3,6 +3,7 @@ import { useAddChatMutation } from "@/4_features/chat/api/mutation";
 import { useSelectedChatQuery } from "@/4_features/chat/api/query";
 import { ChatType } from "@/5_entities/chat/model/type";
 import { computed, ref } from "vue";
+import { v4 as uuidv4 } from "uuid";
 
 const props = defineProps<{
   chatID: any;
@@ -19,7 +20,7 @@ const { mutate } = useAddChatMutation();
 const handleSendMessage = (message: string) => {
   if (selectedChatID.value !== null) {
     const newMessage = <ChatType>{
-      id: Date.now(),
+      id: uuidv4(),
       title: "New",
       content: message,
     };

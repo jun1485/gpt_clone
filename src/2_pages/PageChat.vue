@@ -24,7 +24,7 @@ const selectedChatData = ref<ChatType | null>(null);
 
 const fetchSelectedChatData = async () => {
   if (chatID !== null) {
-    selectedChatData.value = await getDBSelectedChat(Number(chatID));
+    selectedChatData.value = await getDBSelectedChat(chatID);
   }
 };
 
