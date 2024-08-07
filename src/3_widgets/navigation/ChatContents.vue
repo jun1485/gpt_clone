@@ -2,7 +2,7 @@
 import { useAddChatMutation } from "@/4_features/chat/api/mutation";
 import { useSelectedChatQuery } from "@/4_features/chat/api/query";
 import { ChatType } from "@/5_entities/chat/model/type";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
 const props = defineProps<{
@@ -11,21 +11,32 @@ const props = defineProps<{
 
 const selectedChatID = computed(() => props.chatID);
 
-const { data: selectedChatData } = useSelectedChatQuery(selectedChatID);
+const { data: selectedChatData, refetch: refetchSelectedChat } =
+  useSelectedChatQuery(selectedChatID);
+const { mutate: addChat } = useAddChatMutation();
 
 const inputValue = ref("");
 
-const { mutate } = useAddChatMutation();
-
-const handleSendMessage = (message: string) => {
-  if (selectedChatID.value !== null) {
+const handleSendMessage = async () => {
+  if (selectedChatID.value !== null && inputValue.value.trim() !== "") {
     const newMessage = <ChatType>{
       id: uuidv4(),
       title: "New",
-      content: message,
+      content: inputValue.value.trim(),
     };
-    mutate(newMessage);
+
+    try {
+      await addChat(newMessage);
+      inputValue.value = "";
+      await refetchSelectedChat();
+    } catch (error) {
+      console.error(error);
+    }
   }
+
+  watch(selectedChatID, () => {
+    inputValue.value = "";
+  });
 };
 </script>
 
@@ -46,7 +57,7 @@ const handleSendMessage = (message: string) => {
       <input
         type="text"
         v-model="inputValue"
-        @keydown.enter="handleSendMessage(inputValue)"
+        @keydown.enter="handleSendMessage()"
         class="w-full h-14 p-2 border border-gray-400 rounded-md"
         placeholder="메시지를 입력하세요"
       />
