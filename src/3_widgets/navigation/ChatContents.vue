@@ -5,12 +5,12 @@ import { ChatType } from "@/5_entities/chat/model/type";
 import { computed, ref, watch } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
-const chatID = defineModel<any>("chatID");
+const chatID = defineModel<string>("chatID");
 
 const selectedChatID = computed(() => chatID);
 
 const { data: selectedChatData, refetch: refetchSelectedChat } =
-  useSelectedChatQuery(selectedChatID);
+  useSelectedChatQuery(selectedChatID.value);
 const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
 
 const inputValue = ref("");
