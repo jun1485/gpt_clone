@@ -22,7 +22,7 @@ watch(chatData, () => {
   <div class="flex">
     <SideBar :chatData="chatData" @select-chat="chatSelected" />
 
-    <ChatContents :chatID="selectedChatID" />
+    <ChatContents v-model:chatID="selectedChatID" />
   </div>
 </template>
 

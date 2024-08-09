@@ -5,15 +5,13 @@ import { ChatType } from "@/5_entities/chat/model/type";
 import { computed, ref, watch } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
-const props = defineProps<{
-  chatID: any;
-}>();
+const chatID = defineModel<any>("chatID");
 
-const selectedChatID = computed(() => props.chatID);
+const selectedChatID = computed(() => chatID);
 
 const { data: selectedChatData, refetch: refetchSelectedChat } =
   useSelectedChatQuery(selectedChatID);
-const { mutate: addChat } = useAddChatMutation();
+const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
 
 const inputValue = ref("");
 
@@ -60,6 +58,7 @@ const handleSendMessage = async () => {
         @keydown.enter="handleSendMessage()"
         class="w-full h-14 p-2 border border-gray-400 rounded-md"
         placeholder="메시지를 입력하세요"
+        :disabled="isAddingChat"
       />
     </div>
   </div>
