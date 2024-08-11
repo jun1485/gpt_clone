@@ -4,12 +4,16 @@ import { useChatQuery } from "@/4_features/chat/api/query";
 
 import { ref, watch } from "vue";
 
-const { data: chatData } = useChatQuery();
+const { data: chatData, refetch: refetchChatData } = useChatQuery();
 
 const selectedChatID = ref<string | null>(null);
 
 const chatSelected = (chatId: string | null) => {
   selectedChatID.value = chatId;
+};
+
+const refreshChatList = async () => {
+  await refetchChatData();
 };
 
 watch(chatData, () => {
@@ -22,7 +26,10 @@ watch(chatData, () => {
   <div class="flex">
     <SideBar :chatData="chatData" @select-chat="chatSelected" />
 
-    <ChatContents v-model:chatID="selectedChatID" />
+    <ChatContents
+      v-model:chatID="selectedChatID"
+      @refetch-chat-list="refreshChatList"
+    />
   </div>
 </template>
 

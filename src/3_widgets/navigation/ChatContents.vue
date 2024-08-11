@@ -5,6 +5,10 @@ import { ChatType } from "@/5_entities/chat/model/type";
 import { computed, ref, watch } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
+const emit = defineEmits<{
+  (e: "refetch-chat-list"): void;
+}>();
+
 const chatID = defineModel<string>("chatID");
 
 const selectedChatID = computed(() => chatID);
@@ -27,6 +31,7 @@ const handleSendMessage = async () => {
       await addChat(newMessage);
       inputValue.value = "";
       await refetchSelectedChat();
+      emit("refetch-chat-list");
     } catch (error) {
       console.error(error);
     }

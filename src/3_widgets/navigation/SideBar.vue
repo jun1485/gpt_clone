@@ -4,7 +4,6 @@ defineProps<{
 }>();
 
 const emit = defineEmits(["selectChat"]);
-// TODO: messages mutation
 
 const selectChat = (chatId: number | null) => {
   emit("selectChat", chatId);
