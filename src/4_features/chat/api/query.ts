@@ -23,13 +23,14 @@ export const getDBSelectedChat = async (
   const chatCollection = collection(db, "chats");
   const q = query(chatCollection, where("id", "==", uuid)); // UUID를 기준으로 쿼리
   const chatSnapshot = await getDocs(q);
+  console.log(chatSnapshot.docs[0].data());
 
   if (!chatSnapshot.empty) {
     const chatDoc = chatSnapshot.docs[0];
-    return {
-      ...chatDoc.data(),
-    } as ChatType;
+    return chatDoc.data();
   } else {
+    console.log("fail");
+
     return null;
   }
 };
@@ -47,8 +48,10 @@ export const useSelectedChatQuery = (
     queryKey: ["chat", id],
     queryFn: () => {
       if (id.value !== null) {
+        console.log("result: ", getDBSelectedChat(id.value.toString()));
+
         return getDBSelectedChat(id.value.toString());
       }
-      return null;
+      return Promise.resolve(null);
     },
   });
