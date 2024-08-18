@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 const chatID = defineModel<string>("chatID");
 
-const selectedChatID = computed(() => chatID);
+const selectedChatID = computed(() => chatID.value);
 
 const { data: selectedChatData, refetch: refetchSelectedChat } =
   useSelectedChatQuery(selectedChatID);
@@ -64,9 +64,10 @@ watch(selectedChatID, () => {
     <h1 class="text-xl">My GPT</h1>
 
     <div v-if="!selectedChatData" class="mx-auto">
+      {{ selectedChatData }}
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
-    <div v0else class="flex flex-col gap-2">
+    <div v-else class="flex flex-col gap-2">
       <div v-for="message in selectedChatData?.messages" :key="message.id">
         {{ message?.content }}
       </div>
