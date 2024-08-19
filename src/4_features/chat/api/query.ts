@@ -1,16 +1,37 @@
 import { useQuery, UseQueryReturnType } from "@tanstack/vue-query";
-import { ChatType } from "../../../5_entities/chat/model/type";
+import { ChatType, MessageType } from "../../../5_entities/chat/model/type";
 import { ComputedRef } from "vue";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  DocumentData,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { db } from "@/server/firebase";
+
+const convertToChatType = (doc: DocumentData): ChatType => {
+  const data = doc.data();
+  return {
+    id: doc.id,
+    title: data.title || "",
+    messages: Array.isArray(data.messages)
+      ? data.messages.map(
+          (msg: any): MessageType => ({
+            id: msg.id || "",
+            content: msg.content || "",
+            timestamp: msg.timestamp || "",
+          })
+        )
+      : [],
+  };
+};
 
 // 모든 채팅 데이터를 가져오는 함수
 export const getDBChats = async (): Promise<ChatType[]> => {
   const chatCollection = collection(db, "chats");
   const chatSnapshot = await getDocs(chatCollection);
-
-  const chatList = chatSnapshot.docs.map((doc) => doc.data() as ChatType);
-
+  const chatList = chatSnapshot.docs.map(convertToChatType);
   return chatList;
 };
 
@@ -19,18 +40,15 @@ export const getDBSelectedChat = async (
   uuid: string | null
 ): Promise<ChatType | null> => {
   if (uuid === null) return null;
-
   const chatCollection = collection(db, "chats");
-  const q = query(chatCollection, where("id", "==", uuid)); // UUID를 기준으로 쿼리
+  const q = query(chatCollection, where("id", "==", uuid));
   const chatSnapshot = await getDocs(q);
-  console.log(chatSnapshot.docs[0].data());
 
   if (!chatSnapshot.empty) {
     const chatDoc = chatSnapshot.docs[0];
-    return chatDoc.data();
+    return convertToChatType(chatDoc);
   } else {
-    console.log("fail");
-
+    console.log("Chat not found");
     return null;
   }
 };
@@ -46,12 +64,12 @@ export const useSelectedChatQuery = (
 ): UseQueryReturnType<ChatType | null, unknown> =>
   useQuery({
     queryKey: ["chat", id],
-    queryFn: () => {
+    queryFn: async () => {
       if (id.value !== null) {
-        console.log("result: ", getDBSelectedChat(id.value.toString()));
-
-        return getDBSelectedChat(id.value.toString());
+        const result = await getDBSelectedChat(id.value);
+        console.log("Selected chat:", result);
+        return result;
       }
-      return Promise.resolve(null);
+      return null;
     },
   });
