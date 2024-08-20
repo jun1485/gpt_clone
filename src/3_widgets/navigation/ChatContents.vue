@@ -25,8 +25,8 @@ const { mutate: addMessage, isPending: isAddingMessage } =
 const inputValue = ref("");
 
 const handleSendMessage = async () => {
-  if (selectedChatID.value !== null && inputValue.value.trim() !== "") {
-    const newMessage = <MessageType>{
+  if (inputValue.value.trim() !== "") {
+    const newMessage: MessageType = {
       id: uuidv4(),
       content: inputValue.value.trim(),
       timestamp: new Date().toISOString(),
@@ -34,6 +34,7 @@ const handleSendMessage = async () => {
 
     try {
       if (selectedChatID.value) {
+        // 기존 채팅에 메시지 추가
         await addMessage({ chatID: selectedChatID.value, message: newMessage });
       } else {
         // 새 채팅방 생성
@@ -49,7 +50,7 @@ const handleSendMessage = async () => {
       await refetchSelectedChat();
       emit("refetch-chat-list");
     } catch (error) {
-      console.error(error);
+      console.error("Failed to send message:", error);
     }
   }
 };
@@ -67,7 +68,7 @@ watch(selectedChatID, () => {
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
     <div v-else class="flex flex-col gap-2">
-      {{ selectedChatData.content }}
+      {{ selectedChatData.messages }}
     </div>
 
     <div class="grow" />

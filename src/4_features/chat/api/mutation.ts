@@ -14,13 +14,14 @@ interface AddMessageParams {
   message: MessageType;
 }
 
-const addNewChatToDB = async (newChat: ChatType): Promise<void> => {
+const addNewChatToDB = async (newChat: ChatType): Promise<string> => {
   const chatCollection = collection(db, "chats");
-  await addDoc(chatCollection, newChat);
+  const docRef = await addDoc(chatCollection, newChat);
+  return docRef.id;
 };
 
 export const useAddChatMutation = (): UseMutationReturnType<
-  unknown,
+  string,
   Error,
   ChatType,
   unknown
@@ -42,7 +43,7 @@ const addMessageToChat = async ({
 };
 
 export const useAddMessageMutation = (): UseMutationReturnType<
-  unknown,
+  void,
   Error,
   AddMessageParams,
   unknown
