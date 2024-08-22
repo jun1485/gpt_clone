@@ -35,6 +35,12 @@ export const getDBChats = async (): Promise<ChatType[]> => {
   return chatList;
 };
 
+export const useChatQuery = (): UseQueryReturnType<ChatType[], unknown> =>
+  useQuery({
+    queryKey: ["chats"],
+    queryFn: getDBChats,
+  });
+
 // 특정 채팅 데이터를 가져오는 함수
 export const getDBSelectedChat = async (
   uuid: string | null
@@ -52,12 +58,6 @@ export const getDBSelectedChat = async (
     return null;
   }
 };
-
-export const useChatQuery = (): UseQueryReturnType<ChatType[], unknown> =>
-  useQuery({
-    queryKey: ["chats"],
-    queryFn: getDBChats,
-  });
 
 export const useSelectedChatQuery = (
   id: ComputedRef<string | null>
