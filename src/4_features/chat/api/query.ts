@@ -3,7 +3,9 @@ import { ChatType, MessageType } from "../../../5_entities/chat/model/type";
 import { ComputedRef } from "vue";
 import {
   collection,
+  doc,
   DocumentData,
+  getDoc,
   getDocs,
   query,
   where,
@@ -41,20 +43,16 @@ export const useChatQuery = (): UseQueryReturnType<ChatType[], unknown> =>
     queryFn: getDBChats,
   });
 
-// 특정 채팅 데이터를 가져오는 함수
 export const getDBSelectedChat = async (
-  uuid: string | null
+  uuid: string
 ): Promise<ChatType | null> => {
-  if (uuid === null) return null;
-  const chatCollection = collection(db, "chats");
-  const q = query(chatCollection, where("id", "==", uuid));
-  const chatSnapshot = await getDocs(q);
+  const chatDoc = doc(db, "chats", uuid);
+  const chatSnapshot = await getDoc(chatDoc);
 
-  if (!chatSnapshot.empty) {
-    const chatDoc = chatSnapshot.docs[0];
-    return convertToChatType(chatDoc);
+  if (chatSnapshot.exists()) {
+    return convertToChatType(chatSnapshot);
   } else {
-    console.log("Chat not found");
+    console.log(`Chat not found for ID: ${uuid}`);
     return null;
   }
 };
@@ -66,10 +64,13 @@ export const useSelectedChatQuery = (
     queryKey: ["chat", id],
     queryFn: async () => {
       if (id.value !== null) {
+        console.log(`Fetching chat with ID: ${id.value}`);
         const result = await getDBSelectedChat(id.value);
         console.log("Selected chat:", result);
         return result;
       }
+      console.log("No chat ID provided");
       return null;
     },
+    enabled: !!id.value,
   });
