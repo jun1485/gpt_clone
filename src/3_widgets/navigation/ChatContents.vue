@@ -5,7 +5,7 @@ import {
 } from "@/4_features/chat/api/mutation";
 import { useSelectedChatQuery } from "@/4_features/chat/api/query";
 import { ChatType, MessageType } from "@/5_entities/chat/model/type";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { v4 as uuidv4 } from "uuid";
 
 const emit = defineEmits<{
@@ -14,10 +14,8 @@ const emit = defineEmits<{
 
 const chatID = defineModel<string>("chatID");
 
-const selectedChatID = computed(() => chatID.value);
-
 const { data: selectedChatData, refetch: refetchSelectedChat } =
-  useSelectedChatQuery(selectedChatID);
+  useSelectedChatQuery(chatID);
 const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
 const { mutate: addMessage, isPending: isAddingMessage } =
   useAddMessageMutation();
@@ -33,9 +31,9 @@ const handleSendMessage = async () => {
     };
 
     try {
-      if (selectedChatID.value) {
+      if (chatID.value) {
         // 기존 채팅에 메시지 추가
-        await addMessage({ chatID: selectedChatID.value, message: newMessage });
+        await addMessage({ chatID: chatID.value, message: newMessage });
       } else {
         // 새 채팅방 생성
         const newChat: ChatType = {
@@ -55,7 +53,9 @@ const handleSendMessage = async () => {
   }
 };
 
-watch(selectedChatID, () => {
+watch(chatID, () => {
+  console.log("chatID changed:", chatID.value);
+
   inputValue.value = "";
 });
 </script>

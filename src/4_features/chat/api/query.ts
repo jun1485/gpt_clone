@@ -1,14 +1,12 @@
 import { useQuery, UseQueryReturnType } from "@tanstack/vue-query";
 import { ChatType, MessageType } from "../../../5_entities/chat/model/type";
-import { ComputedRef } from "vue";
+import { Ref } from "vue";
 import {
   collection,
   doc,
   DocumentData,
   getDoc,
   getDocs,
-  query,
-  where,
 } from "firebase/firestore";
 import { db } from "@/server/firebase";
 
@@ -58,7 +56,7 @@ export const getDBSelectedChat = async (
 };
 
 export const useSelectedChatQuery = (
-  id: ComputedRef<string | null>
+  id: Ref<string | null>
 ): UseQueryReturnType<ChatType | null, unknown> =>
   useQuery({
     queryKey: ["chat", id],
