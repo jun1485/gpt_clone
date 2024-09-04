@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import {
   useAddChatMutation,
   useAddMessageMutation,
@@ -14,13 +15,19 @@ const emit = defineEmits<{
 
 const chatID = defineModel<string>("chatID");
 
-const { data: selectedChatData, refetch: refetchSelectedChat } =
-  useSelectedChatQuery(chatID);
+const {
+  data: selectedChatData,
+  refetch: refetchSelectedChat,
+  isLoading,
+  error,
+} = useSelectedChatQuery(chatID);
 const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
 const { mutate: addMessage, isPending: isAddingMessage } =
   useAddMessageMutation();
 
 const inputValue = ref("");
+
+const currentChat = computed(() => selectedChatData.value);
 
 const handleSendMessage = async () => {
   if (inputValue.value.trim() !== "") {
@@ -32,30 +39,28 @@ const handleSendMessage = async () => {
 
     try {
       if (chatID.value) {
-        // 기존 채팅에 메시지 추가
         await addMessage({ chatID: chatID.value, message: newMessage });
       } else {
-        // 새 채팅방 생성
         const newChat: ChatType = {
           id: uuidv4(),
-          title: newMessage.content.slice(0, 20) + "...", // 첫 메시지의 일부를 제목으로 사용
+          title: newMessage.content.slice(0, 20) + "...",
           messages: [newMessage],
         };
         await addChat(newChat);
-        chatID.value = newChat.id; // 새로 생성된 채팅방 선택
+        chatID.value = newChat.id;
       }
       inputValue.value = "";
       await refetchSelectedChat();
       emit("refetch-chat-list");
     } catch (error) {
       console.error("Failed to send message:", error);
+      // TODO: Show error message to user
     }
   }
 };
 
 watch(chatID, () => {
   console.log("chatID changed:", chatID.value);
-
   inputValue.value = "";
 });
 </script>
@@ -64,11 +69,23 @@ watch(chatID, () => {
   <div class="flex flex-col gap-3 px-6 py-4 w-full">
     <h1 class="text-xl">My GPT</h1>
 
-    <div v-if="!selectedChatData" class="mx-auto">
+    <div v-if="isLoading" class="mx-auto">
+      <p>Loading...</p>
+    </div>
+    <div v-else-if="error" class="mx-auto">
+      <p>Error: {{ error.message }}</p>
+    </div>
+    <div v-else-if="!currentChat" class="mx-auto">
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
     <div v-else class="flex flex-col gap-2">
-      {{ selectedChatData.messages }}
+      <div
+        v-for="message in currentChat.messages"
+        :key="message.id"
+        class="message"
+      >
+        {{ message.content }}
+      </div>
     </div>
 
     <div class="grow" />
@@ -85,5 +102,3 @@ watch(chatID, () => {
     </div>
   </div>
 </template>
-
-<style lang="scss"></style>
