@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import router from "@/1_app/router";
 import { ChatContents, SideBar } from "@/3_widgets/navigation";
 import { useChatQuery } from "@/4_features/chat/api/query";
 
@@ -10,6 +11,7 @@ const selectedChatID = ref<string | null>(null);
 
 const chatSelected = (chatId: string | null) => {
   selectedChatID.value = chatId;
+  router.push({ name: "chat", params: { id: chatId } });
 };
 
 const refreshChatList = async () => {

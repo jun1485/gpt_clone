@@ -5,7 +5,7 @@ import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
-const chatID = route.params.id as string; // URL 파라미터에서 채팅 ID 가져오기
+const chatID = route.params.id as string;
 
 const selectedChatData = ref<ChatType | null>(null);
 
