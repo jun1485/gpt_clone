@@ -37,3 +37,5 @@ watch(chatData, () => {
     </main>
   </div>
 </template>
+
+<style scoped></style>

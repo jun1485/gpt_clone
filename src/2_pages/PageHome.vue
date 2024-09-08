@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import router from "@/1_app/router";
-import { ChatContents, SideBar } from "@/3_widgets/navigation";
+import { ChatContents } from "@/3_widgets/navigation";
 import { useChatQuery } from "@/4_features/chat/api/query";
 
 import { ref, watch } from "vue";
@@ -25,14 +25,10 @@ watch(chatData, () => {
 </script>
 
 <template>
-  <div class="flex">
-    <SideBar :chatData="chatData" @select-chat="chatSelected" />
-
-    <ChatContents
-      v-model:chatID="selectedChatID"
-      @refetch-chat-list="refreshChatList"
-    />
-  </div>
+  <ChatContents
+    v-model:chatID="selectedChatID"
+    @refetch-chat-list="refreshChatList"
+  />
 </template>
 
 <style lang="scss"></style>

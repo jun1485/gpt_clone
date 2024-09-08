@@ -12,7 +12,7 @@ const selectChat = (chatId: number | null) => {
 
 <template>
   <div
-    class="sticky top-0 left-0 flex flex-col bg-black/90 h-[100svh] w-72 p-3"
+    class="sticky top-0 left-0 flex flex-col bg-black/90 h-[100svh] w-72 min-w-[18rem] max-w-[18rem] p-3"
   >
     <div class="flex justify-center gap-3 h-10">
       <h1 class="text-lg text-white">Jun's GPT</h1>
@@ -39,3 +39,5 @@ const selectChat = (chatId: number | null) => {
 </template>
 
 <style lang="scss"></style>
+
+<style scoped></style>
