@@ -6,8 +6,10 @@ import {
 } from "@/4_features/chat/api/mutation";
 import { useSelectedChatQuery } from "@/4_features/chat/api/query";
 import { ChatType, MessageType } from "@/5_entities/chat/model/type";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
+import InputMessage from "@/6_shared/ui/InputMessage.vue";
 
 const emit = defineEmits<{
   (e: "refetch-chat-list"): void;
@@ -25,55 +27,92 @@ const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
 const { mutate: addMessage, isPending: isAddingMessage } =
   useAddMessageMutation();
 
-const inputValue = ref("");
-
 const currentChat = computed(() => selectedChatData.value);
 
-const handleSendMessage = async () => {
-  if (inputValue.value.trim() !== "") {
-    const newMessage: MessageType = {
+const API_KEY = import.meta.env.OPENAI_API_KEY;
+const API_URL = import.meta.env.OPENAI_API_URL;
+
+const isWaitingForResponse = ref(false);
+
+const callGPTAPI = async (message: string): Promise<string> => {
+  try {
+    const response = await axios.post(
+      API_URL,
+      {
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: message }],
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+      }
+    );
+    return response.data.choices[0].message.content;
+  } catch (error) {
+    console.error("GPT API 호출 중 오류 발생:", error);
+    throw new Error("GPT 응답을 가져오는 데 실패했습니다.");
+  }
+};
+
+const handleSendMessage = async (message: string) => {
+  if (message !== "") {
+    const userMessage: MessageType = {
       id: uuidv4(),
-      content: inputValue.value.trim(),
+      content: message,
       timestamp: new Date().toISOString(),
     };
 
     try {
-      if (chatID.value) {
-        await addMessage({ chatID: chatID.value, message: newMessage });
-      } else {
+      let currentChatID = chatID.value;
+      if (!currentChatID) {
         const newChat: ChatType = {
           id: uuidv4(),
-          title: newMessage.content.slice(0, 20) + "...",
-          messages: [newMessage],
+          title: userMessage.content.slice(0, 20) + "...",
+          messages: [userMessage],
         };
         await addChat(newChat);
-        chatID.value = newChat.id;
+        currentChatID = newChat.id;
+        chatID.value = currentChatID;
+      } else {
+        await addMessage({ chatID: currentChatID, message: userMessage });
       }
-      inputValue.value = "";
+
       await refetchSelectedChat();
       emit("refetch-chat-list");
+
+      // GPT API 호출
+      isWaitingForResponse.value = true;
+      const gptResponse = await callGPTAPI(userMessage.content);
+
+      const gptMessage: MessageType = {
+        id: uuidv4(),
+        content: gptResponse,
+        timestamp: new Date().toISOString(),
+      };
+
+      await addMessage({ chatID: currentChatID, message: gptMessage });
+      await refetchSelectedChat();
+      isWaitingForResponse.value = false;
     } catch (error) {
-      console.error("Failed to send message:", error);
-      // TODO: Show error message to user
+      console.error("메시지 전송 또는 GPT 응답 처리 중 오류 발생:", error);
+      // TODO: 사용자에게 오류 메시지 표시
+      isWaitingForResponse.value = false;
     }
   }
 };
-
-watch(chatID, () => {
-  console.log("chatID changed:", chatID.value);
-  inputValue.value = "";
-});
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 px-6 py-4 w-full">
+  <div class="flex flex-col gap-3 px-6 py-4 w-full h-full justify-between">
     <h1 class="text-xl">My GPT</h1>
 
     <div v-if="isLoading" class="mx-auto">
-      <p>Loading...</p>
+      <p>로딩 중...</p>
     </div>
     <div v-else-if="error" class="mx-auto">
-      <p>Error: {{ error.message }}</p>
+      <p>오류: {{ error.message }}</p>
     </div>
     <div v-else-if="!currentChat" class="mx-auto">
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
@@ -82,7 +121,7 @@ watch(chatID, () => {
       <div
         v-for="message in currentChat.messages"
         :key="message.id"
-        class="message"
+        class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800"
       >
         {{ message.content }}
       </div>
@@ -90,15 +129,14 @@ watch(chatID, () => {
 
     <div class="grow" />
 
-    <div class="h-16">
-      <input
-        type="text"
-        v-model="inputValue"
-        @keydown.enter="handleSendMessage()"
-        class="w-full h-14 p-2 border border-gray-400 rounded-md"
-        placeholder="메시지를 입력하세요"
-        :disabled="isAddingMessage || isAddingChat"
-      />
+    <InputMessage
+      @send="handleSendMessage"
+      :disabled="isAddingMessage || isAddingChat || isWaitingForResponse"
+    />
+    <div v-if="isWaitingForResponse" class="text-center mt-2">
+      GPT 응답을 기다리는 중...
     </div>
   </div>
 </template>
+
+<style scoped></style>

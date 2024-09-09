@@ -62,7 +62,6 @@ export const useSelectedChatQuery = (
     queryKey: ["chat", id],
     queryFn: async () => {
       if (id.value !== null) {
-        console.log(`Fetching chat with ID: ${id.value}`);
         const result = await getDBSelectedChat(id.value);
         console.log("Selected chat:", result);
         return result;
