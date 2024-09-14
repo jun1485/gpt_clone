@@ -9,8 +9,13 @@ const { data: chatData, refetch: refetchChatData } = useChatQuery();
 const selectedChatID = ref<string | null>(null);
 
 const chatSelected = (chatId: string | null) => {
-  selectedChatID.value = chatId;
-  router.push({ name: "chat", params: { id: chatId } });
+  if (chatId === null) {
+    selectedChatID.value = null;
+    router.push({ name: "home" });
+  } else {
+    selectedChatID.value = chatId;
+    router.push({ name: "chat", params: { id: chatId } });
+  }
 };
 
 const refreshChatList = async () => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ChatContents } from "@/3_widgets/navigation";
 import { useChatQuery } from "@/4_features/chat/api/query";
+import { ChatContents } from "@/3_widgets/chat";
 
 import { ref, watch } from "vue";
 
