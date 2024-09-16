@@ -6,7 +6,7 @@ import { ref, watch } from "vue";
 
 const { data: chatData, refetch: refetchChatData } = useChatQuery();
 
-const selectedChatID = ref<string | null>(null);
+const selectedChatID = ref<string | undefined>(undefined);
 
 const refreshChatList = async () => {
   await refetchChatData();
