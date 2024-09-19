@@ -2,7 +2,6 @@
 import { ChatContents } from "@/3_widgets/chat";
 import { getDBSelectedChat } from "@/4_features/chat/api/query";
 import { ChatType } from "@/5_entities/chat/model/type";
-import InputMessage from "@/6_shared/ui/InputMessage.vue";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
@@ -22,7 +21,7 @@ onMounted(fetchSelectedChatData);
 
 <template>
   <div class="flex flex-col gap-3 px-6 py-4 w-full h-full justify-between">
-    <ChatContents />
+    <ChatContents :chatID="route.params.id" />
   </div>
 </template>
 

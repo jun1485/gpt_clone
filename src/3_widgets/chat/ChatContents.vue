@@ -1,3 +1,4 @@
+de
 <script setup lang="ts">
 import { computed } from "vue";
 import {
@@ -15,14 +16,14 @@ const emit = defineEmits<{
   (e: "refetch-chat-list"): void;
 }>();
 
-const chatID = defineModel<string>("chatID");
+const chatID = defineModel<string | null>("chatID", { default: null });
 
 const {
   data: selectedChatData,
   refetch: refetchSelectedChat,
   isLoading,
   error,
-} = useSelectedChatQuery(chatID);
+} = useSelectedChatQuery(computed(() => chatID.value));
 const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
 const { mutate: addMessage, isPending: isAddingMessage } =
   useAddMessageMutation();
@@ -112,7 +113,7 @@ const handleSendMessage = async (message: string) => {
       <p>로딩 중...</p>
     </div>
     <div v-else-if="error" class="mx-auto">
-      <p>오류: {{ error.message }}</p>
+      <p>오류: {{ error }}</p>
     </div>
     <div v-else-if="!currentChat" class="mx-auto">
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
