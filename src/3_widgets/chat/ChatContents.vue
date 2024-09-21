@@ -11,10 +11,13 @@ import { ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import InputMessage from "@/6_shared/ui/InputMessage.vue";
+import { useRouter } from "vue-router";
 
 const emit = defineEmits<{
   (e: "refetch-chat-list"): void;
 }>();
+
+const router = useRouter();
 
 const chatID = defineModel<string | null>("chatID", { default: null });
 
@@ -76,6 +79,8 @@ const handleSendMessage = async (message: string) => {
         await addChat(newChat);
         currentChatID = newChat.id;
         chatID.value = currentChatID;
+
+        router.push({ path: `/chat/${currentChatID}` });
       } else {
         await addMessage({ chatID: currentChatID, message: userMessage });
       }

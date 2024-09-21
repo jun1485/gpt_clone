@@ -2,11 +2,11 @@ import { ChatType, MessageType } from "@/5_entities/chat/model/type";
 import { db } from "@/server/firebase";
 import { useMutation, UseMutationReturnType } from "@tanstack/vue-query";
 import {
-  addDoc,
   arrayUnion,
   collection,
   doc,
   updateDoc,
+  setDoc,
 } from "firebase/firestore";
 
 interface AddMessageParams {
@@ -16,8 +16,9 @@ interface AddMessageParams {
 
 const addNewChatToDB = async (newChat: ChatType): Promise<string> => {
   const chatCollection = collection(db, "chats");
-  const docRef = await addDoc(chatCollection, newChat);
-  return docRef.id;
+  const docRef = doc(chatCollection, newChat.id);
+  await setDoc(docRef, newChat);
+  return newChat.id;
 };
 
 export const useAddChatMutation = (): UseMutationReturnType<
