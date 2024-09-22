@@ -7,6 +7,7 @@ import {
   doc,
   updateDoc,
   setDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 interface AddMessageParams {
@@ -52,5 +53,22 @@ export const useAddMessageMutation = (): UseMutationReturnType<
   return useMutation({
     mutationFn: addMessageToChat,
     mutationKey: ["addMessage"],
+  });
+};
+
+const deleteChatFromDB = async (chatID: string): Promise<void> => {
+  const chatRef = doc(db, "chats", chatID);
+  await deleteDoc(chatRef);
+};
+
+export const useDeleteChatMutation = (): UseMutationReturnType<
+  void,
+  Error,
+  string,
+  unknown
+> => {
+  return useMutation({
+    mutationFn: deleteChatFromDB,
+    mutationKey: ["deleteChat"],
   });
 };
