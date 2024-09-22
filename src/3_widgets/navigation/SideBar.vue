@@ -1,12 +1,23 @@
 <script setup lang="ts">
+import { XMarkIcon } from "@heroicons/vue/24/solid";
+import { useDeleteChatMutation } from "@/4_features/chat/api/mutation";
+
 defineProps<{
   chatData: any;
 }>();
 
-const emit = defineEmits(["selectChat"]);
+const emit = defineEmits(["selectChat", "deleteChat"]);
 
 const selectChat = (chatId: number | null) => {
   emit("selectChat", chatId);
+};
+
+const { mutate: deleteChat } = useDeleteChatMutation();
+
+const handleDeleteChat = async (chatId: string, event: Event) => {
+  event.stopPropagation();
+  await deleteChat(chatId);
+  emit("deleteChat", chatId);
 };
 </script>
 
@@ -22,9 +33,13 @@ const selectChat = (chatId: number | null) => {
       v-for="chat in chatData"
       :key="chat.id"
       @click="selectChat(chat.id)"
-      class="p-2 bg-transparent hover:bg-gray-400/10 rounded-md cursor-pointer text-white"
+      class="p-2 bg-transparent hover:bg-gray-400/10 rounded-md cursor-pointer text-white flex justify-between items-center"
     >
-      {{ chat.title }}
+      <span>{{ chat.title }}</span>
+      <XMarkIcon
+        @click="handleDeleteChat(chat.id, $event)"
+        class="h-5 w-5 text-gray-400 hover:text-white cursor-pointer"
+      />
     </div>
 
     <div class="grow" />
@@ -37,7 +52,5 @@ const selectChat = (chatId: number | null) => {
     </button>
   </div>
 </template>
-
-<style lang="scss"></style>
 
 <style scoped></style>
