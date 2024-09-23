@@ -22,6 +22,13 @@ const refreshChatList = async () => {
   await refetchChatData();
 };
 
+const handleDeleteChat = async (chatId: string) => {
+  await refreshChatList();
+  if (selectedChatID.value === chatId) {
+    router.push({ name: "home" });
+  }
+};
+
 watch(chatData, () => {
   if (chatData.value && chatData.value.length > 0)
     selectedChatID.value = chatData.value[0].id;
@@ -31,7 +38,11 @@ watch(chatData, () => {
 <template>
   <div class="flex">
     <div class="w-72 flex-shrink-0">
-      <SideBar :chatData="chatData" @select-chat="chatSelected" />
+      <SideBar
+        :chatData="chatData"
+        @select-chat="chatSelected"
+        @delete-chat="handleDeleteChat"
+      />
     </div>
     <main class="flex-grow">
       <router-view
