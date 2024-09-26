@@ -33,13 +33,17 @@ const { mutate: addMessage, isPending: isAddingMessage } =
 
 const currentChat = computed(() => selectedChatData.value);
 
-const API_KEY = import.meta.env.OPENAI_API_KEY;
-const API_URL = import.meta.env.OPENAI_API_URL;
+const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const API_URL = import.meta.env.VITE_OPENAI_API_URL;
 
 const isWaitingForResponse = ref(false);
 
 const callGPTAPI = async (message: string): Promise<string> => {
   try {
+    if (!API_URL || !API_KEY) {
+      throw new Error("API URL 또는 API 키가 설정되지 않았습니다.");
+    }
+
     const response = await axios.post(
       API_URL,
       {
