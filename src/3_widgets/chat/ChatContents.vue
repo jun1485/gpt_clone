@@ -37,6 +37,26 @@ const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const API_URL = import.meta.env.VITE_OPENAI_API_URL;
 
 const isWaitingForResponse = ref(false);
+const pendingGPTResponse = ref("");
+
+const currentChatWithPendingResponse = computed(() => {
+  if (!currentChat.value || !isWaitingForResponse.value) {
+    return currentChat.value;
+  }
+
+  return {
+    ...currentChat.value,
+    messages: [
+      ...currentChat.value.messages,
+      {
+        id: "pending-gpt-response",
+        content:
+          pendingGPTResponse.value || "GPT가 응답을 생성하고 있습니다...",
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  };
+});
 
 const callGPTAPI = async (message: string): Promise<string> => {
   try {
@@ -49,15 +69,38 @@ const callGPTAPI = async (message: string): Promise<string> => {
       {
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: message }],
+        stream: true,
       },
       {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${API_KEY}`,
         },
+        responseType: "text",
       }
     );
-    return response.data.choices[0].message.content;
+
+    let fullResponse = "";
+    const reader = response.data.split("\n");
+    for (const line of reader) {
+      if (line.startsWith("data: ")) {
+        const data = line.slice(6);
+        if (data === "[DONE]") {
+          break;
+        }
+        try {
+          const parsed = JSON.parse(data);
+          const content = parsed.choices[0].delta.content;
+          if (content) {
+            fullResponse += content;
+            pendingGPTResponse.value = fullResponse;
+          }
+        } catch (error) {
+          console.error("Error parsing stream message:", error);
+        }
+      }
+    }
+    return fullResponse;
   } catch (error) {
     console.error("GPT API 호출 중 오류 발생:", error);
     throw new Error("GPT 응답을 가져오는 데 실패했습니다.");
@@ -94,6 +137,7 @@ const handleSendMessage = async (message: string) => {
 
       // GPT API 호출
       isWaitingForResponse.value = true;
+      pendingGPTResponse.value = "";
       const gptResponse = await callGPTAPI(userMessage.content);
 
       const gptMessage: MessageType = {
@@ -104,11 +148,12 @@ const handleSendMessage = async (message: string) => {
 
       await addMessage({ chatID: currentChatID, message: gptMessage });
       await refetchSelectedChat();
-      isWaitingForResponse.value = false;
     } catch (error) {
       console.error("메시지 전송 또는 GPT 응답 처리 중 오류 발생:", error);
       // TODO: 사용자에게 오류 메시지 표시
+    } finally {
       isWaitingForResponse.value = false;
+      pendingGPTResponse.value = "";
     }
   }
 };
@@ -124,14 +169,19 @@ const handleSendMessage = async (message: string) => {
     <div v-else-if="error" class="mx-auto">
       <p>오류: {{ error }}</p>
     </div>
-    <div v-else-if="!currentChat" class="mx-auto">
+    <div v-else-if="!currentChatWithPendingResponse" class="mx-auto">
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
     <div v-else class="flex flex-col gap-2">
       <div
-        v-for="message in currentChat.messages"
+        v-for="message in currentChatWithPendingResponse.messages"
         :key="message.id"
-        class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800"
+        class="p-2 rounded-lg"
+        :class="{
+          'bg-gray-100 dark:bg-gray-800': message.id !== 'pending-gpt-response',
+          'bg-blue-100 dark:bg-blue-800 animate-pulse':
+            message.id === 'pending-gpt-response',
+        }"
       >
         {{ message.content }}
       </div>
