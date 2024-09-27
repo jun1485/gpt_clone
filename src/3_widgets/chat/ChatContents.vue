@@ -1,4 +1,3 @@
-de
 <script setup lang="ts">
 import { computed } from "vue";
 import {
@@ -38,6 +37,8 @@ const API_URL = import.meta.env.VITE_OPENAI_API_URL;
 
 const isWaitingForResponse = ref(false);
 const pendingGPTResponse = ref("");
+const isTyping = ref(false);
+const typedResponse = ref("");
 
 const currentChatWithPendingResponse = computed(() => {
   if (!currentChat.value || !isWaitingForResponse.value) {
@@ -50,8 +51,9 @@ const currentChatWithPendingResponse = computed(() => {
       ...currentChat.value.messages,
       {
         id: "pending-gpt-response",
-        content:
-          pendingGPTResponse.value || "GPT가 응답을 생성하고 있습니다...",
+        content: isTyping.value
+          ? typedResponse.value
+          : "GPT가 응답을 생성하고 있습니다...",
         timestamp: new Date().toISOString(),
       },
     ],
@@ -94,6 +96,7 @@ const callGPTAPI = async (message: string): Promise<string> => {
           if (content) {
             fullResponse += content;
             pendingGPTResponse.value = fullResponse;
+            await typeResponse(content);
           }
         } catch (error) {
           console.error("Error parsing stream message:", error);
@@ -104,6 +107,14 @@ const callGPTAPI = async (message: string): Promise<string> => {
   } catch (error) {
     console.error("GPT API 호출 중 오류 발생:", error);
     throw new Error("GPT 응답을 가져오는 데 실패했습니다.");
+  }
+};
+
+const typeResponse = async (text: string) => {
+  isTyping.value = true;
+  for (let i = 0; i < text.length; i++) {
+    typedResponse.value += text[i];
+    await new Promise((resolve) => setTimeout(resolve, 15));
   }
 };
 
@@ -138,6 +149,7 @@ const handleSendMessage = async (message: string) => {
       // GPT API 호출
       isWaitingForResponse.value = true;
       pendingGPTResponse.value = "";
+      typedResponse.value = "";
       const gptResponse = await callGPTAPI(userMessage.content);
 
       const gptMessage: MessageType = {
@@ -154,6 +166,8 @@ const handleSendMessage = async (message: string) => {
     } finally {
       isWaitingForResponse.value = false;
       pendingGPTResponse.value = "";
+      isTyping.value = false;
+      typedResponse.value = "";
     }
   }
 };
