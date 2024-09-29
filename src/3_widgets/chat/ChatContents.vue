@@ -192,15 +192,23 @@ const handleSendMessage = async (message: string) => {
         :key="message.id"
         class="flex"
         :class="{
-          'justify-end': !message.id.startsWith('gpt'),
-          'justify-start': message.id.startsWith('gpt'),
+          'justify-end':
+            !message.id.startsWith('gpt') &&
+            message.id !== 'pending-gpt-response',
+          'justify-start':
+            message.id.startsWith('gpt') ||
+            message.id === 'pending-gpt-response',
         }"
       >
         <div
           class="max-w-[70%] p-3 rounded-lg"
           :class="{
-            'bg-blue-500 text-white': !message.id.startsWith('gpt'),
-            'bg-gray-300 text-black': message.id.startsWith('gpt'),
+            'bg-blue-500 text-white':
+              !message.id.startsWith('gpt') &&
+              message.id !== 'pending-gpt-response',
+            'bg-gray-300 text-black':
+              message.id.startsWith('gpt') ||
+              message.id === 'pending-gpt-response',
             'animate-pulse': message.id === 'pending-gpt-response',
           }"
         >
