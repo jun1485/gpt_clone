@@ -121,7 +121,7 @@ const typeResponse = async (text: string) => {
 const handleSendMessage = async (message: string) => {
   if (message !== "") {
     const userMessage: MessageType = {
-      id: uuidv4(),
+      id: `user-${uuidv4()}`, // 사용자 메시지 ID에 'user-' 접두사 추가
       content: message,
       timestamp: new Date().toISOString(),
     };
@@ -153,7 +153,7 @@ const handleSendMessage = async (message: string) => {
       const gptResponse = await callGPTAPI(userMessage.content);
 
       const gptMessage: MessageType = {
-        id: uuidv4(),
+        id: `gpt-${uuidv4()}`, // GPT 메시지 ID에 'gpt-' 접두사 추가
         content: gptResponse,
         timestamp: new Date().toISOString(),
       };
@@ -186,18 +186,26 @@ const handleSendMessage = async (message: string) => {
     <div v-else-if="!currentChatWithPendingResponse" class="mx-auto">
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
-    <div v-else class="flex flex-col gap-2">
+    <div v-else class="flex flex-col gap-4 overflow-y-auto">
       <div
         v-for="message in currentChatWithPendingResponse.messages"
         :key="message.id"
-        class="p-2 rounded-lg"
+        class="flex"
         :class="{
-          'bg-gray-100 dark:bg-gray-800': message.id !== 'pending-gpt-response',
-          'bg-blue-100 dark:bg-blue-800 animate-pulse':
-            message.id === 'pending-gpt-response',
+          'justify-end': !message.id.startsWith('gpt'),
+          'justify-start': message.id.startsWith('gpt'),
         }"
       >
-        {{ message.content }}
+        <div
+          class="max-w-[70%] p-3 rounded-lg"
+          :class="{
+            'bg-blue-500 text-white': !message.id.startsWith('gpt'),
+            'bg-gray-300 text-black': message.id.startsWith('gpt'),
+            'animate-pulse': message.id === 'pending-gpt-response',
+          }"
+        >
+          {{ message.content }}
+        </div>
       </div>
     </div>
 
@@ -213,4 +221,23 @@ const handleSendMessage = async (message: string) => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.overflow-y-auto {
+  max-height: calc(100vh - 200px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: transparent;
+}
+</style>
