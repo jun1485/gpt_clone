@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import InputMessage from "@/6_shared/ui/InputMessage.vue";
 import { useRouter } from "vue-router";
+import { useWindowSize } from "@vueuse/core";
 
 const emit = defineEmits<{
   (e: "refetch-chat-list"): void;
@@ -30,15 +31,17 @@ const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
 const { mutate: addMessage, isPending: isAddingMessage } =
   useAddMessageMutation();
 
-const currentChat = computed(() => selectedChatData.value);
-
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const API_URL = import.meta.env.VITE_OPENAI_API_URL;
+
+const { width } = useWindowSize();
 
 const isWaitingForResponse = ref(false);
 const pendingGPTResponse = ref("");
 const isTyping = ref(false);
 const typedResponse = ref("");
+
+const currentChat = computed(() => selectedChatData.value);
 
 const currentChatWithPendingResponse = computed(() => {
   if (!currentChat.value || !isWaitingForResponse.value) {
@@ -171,11 +174,17 @@ const handleSendMessage = async (message: string) => {
     }
   }
 };
+
+const isMobile = computed(() => width.value < 640);
 </script>
 
 <template>
-  <div class="flex flex-col gap-3 px-6 py-4 w-full h-full justify-between">
-    <h1 class="text-xl">My GPT</h1>
+  <div
+    class="flex flex-col gap-3 px-2 sm:px-6 py-2 sm:py-4 w-full h-full justify-between"
+  >
+    <h1 class="text-lg sm:text-xl text-center sm:text-left mb-2 sm:mb-0">
+      My GPT
+    </h1>
 
     <div v-if="isLoading" class="mx-auto">
       <p>로딩 중...</p>
@@ -183,10 +192,13 @@ const handleSendMessage = async (message: string) => {
     <div v-else-if="error" class="mx-auto">
       <p>오류: {{ error }}</p>
     </div>
-    <div v-else-if="!currentChatWithPendingResponse" class="mx-auto">
+    <div
+      v-else-if="!currentChatWithPendingResponse"
+      class="mx-auto text-sm sm:text-base"
+    >
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
-    <div v-else class="flex flex-col gap-4 overflow-y-auto">
+    <div v-else class="flex flex-col gap-2 sm:gap-4 overflow-y-auto">
       <div
         v-for="message in currentChatWithPendingResponse.messages"
         :key="message.id"
@@ -201,7 +213,7 @@ const handleSendMessage = async (message: string) => {
         }"
       >
         <div
-          class="max-w-[70%] p-3 rounded-lg"
+          class="max-w-[90%] sm:max-w-[70%] p-2 sm:p-3 rounded-lg text-sm sm:text-base"
           :class="{
             'bg-blue-500 text-white':
               !message.id.startsWith('gpt') &&
@@ -222,8 +234,13 @@ const handleSendMessage = async (message: string) => {
     <InputMessage
       @send="handleSendMessage"
       :disabled="isAddingMessage || isAddingChat || isWaitingForResponse"
+      class="mt-2 sm:mt-4"
+      :placeholder="isMobile ? '메시지 입력...' : '메시지를 입력하세요'"
     />
-    <div v-if="isWaitingForResponse" class="text-center mt-2">
+    <div
+      v-if="isWaitingForResponse"
+      class="text-center mt-1 sm:mt-2 text-xs sm:text-sm"
+    >
       GPT 응답을 기다리는 중...
     </div>
   </div>
@@ -231,21 +248,27 @@ const handleSendMessage = async (message: string) => {
 
 <style scoped>
 .overflow-y-auto {
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 180px);
   scrollbar-width: thin;
   scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
 }
 
 .overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
+  width: 4px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-thumb {
   background-color: rgba(155, 155, 155, 0.5);
-  border-radius: 3px;
+  border-radius: 2px;
 }
 
 .overflow-y-auto::-webkit-scrollbar-track {
   background: transparent;
+}
+
+@media (max-width: 640px) {
+  .overflow-y-auto {
+    max-height: calc(100vh - 130px);
+  }
 }
 </style>
