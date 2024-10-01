@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import { XMarkIcon } from "@heroicons/vue/24/solid";
 import { useDeleteChatMutation } from "@/4_features/chat/api/mutation";
+import { useWindowSize } from "@vueuse/core";
+import { computed } from "vue";
 
 defineProps<{
   chatData: any;
 }>();
 
-const emit = defineEmits(["selectChat", "deleteChat"]);
+const emit = defineEmits(["selectChat", "deleteChat", "closeSidebar"]);
+
+const { width } = useWindowSize();
+const isMobile = computed(() => width.value < 640);
 
 const selectChat = (chatId: number | null) => {
   emit("selectChat", chatId);
+  if (isMobile.value) {
+    emit("closeSidebar");
+  }
 };
 
 const { mutate: deleteChat } = useDeleteChatMutation();
@@ -23,10 +31,15 @@ const handleDeleteChat = async (chatId: string, event: Event) => {
 
 <template>
   <div
-    class="sticky top-0 left-0 flex flex-col bg-black/90 h-[100svh] w-72 min-w-[18rem] max-w-[18rem] p-3"
+    class="flex flex-col bg-black/90 h-[100svh] w-72 min-w-[18rem] max-w-[18rem] p-3"
   >
-    <div class="flex justify-center gap-3 h-10">
+    <div class="flex justify-between items-center h-10 mb-4">
       <h1 class="text-lg text-white">Jun's GPT</h1>
+      <XMarkIcon
+        v-if="isMobile"
+        @click="emit('closeSidebar')"
+        class="h-6 w-6 text-white cursor-pointer"
+      />
     </div>
 
     <div
