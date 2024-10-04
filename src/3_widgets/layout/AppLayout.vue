@@ -38,15 +38,21 @@ watch(chatData, () => {
 
 const { width } = useWindowSize();
 const isMobile = computed(() => width.value < 640);
-const isSidebarOpen = ref(false);
+const isSidebarOpen = ref(!isMobile.value);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
+
+const closeSidebar = () => {
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
+};
 </script>
 
 <template>
-  <div class="flex relative">
+  <div class="flex h-screen overflow-hidden">
     <!-- 햄버거 메뉴 아이콘 (모바일) -->
     <button
       v-if="isMobile"
@@ -56,22 +62,17 @@ const toggleSidebar = () => {
       <Bars3Icon class="h-6 w-6 text-gray-500" />
     </button>
 
-    <!-- 사이드바 (데스크톱 및 모바일) -->
-    <div
-      :class="{
-        'fixed inset-y-0 left-0 transform -translate-x-full': isMobile,
-        'translate-x-0': isSidebarOpen,
-        'transition-transform duration-300 ease-in-out z-40': true,
-      }"
-    >
-      <SideBar
-        :chatData="chatData"
-        @select-chat="chatSelected"
-        @delete-chat="handleDeleteChat"
-        @close-sidebar="isSidebarOpen = false"
-      />
-    </div>
-    <main class="flex-grow">
+    <!-- 사이드바 -->
+    <SideBar
+      :chatData="chatData"
+      :isOpen="isSidebarOpen"
+      @select-chat="chatSelected"
+      @delete-chat="handleDeleteChat"
+      @close-sidebar="closeSidebar"
+    />
+
+    <!-- 메인 콘텐츠 -->
+    <main class="flex-grow overflow-auto">
       <router-view
         :key="$route.fullPath"
         v-model:chatID="selectedChatID"

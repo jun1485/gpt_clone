@@ -6,6 +6,7 @@ import { computed } from "vue";
 
 defineProps<{
   chatData: any;
+  isOpen: boolean;
 }>();
 
 const emit = defineEmits(["selectChat", "deleteChat", "closeSidebar"]);
@@ -27,11 +28,25 @@ const handleDeleteChat = async (chatId: string, event: Event) => {
   await deleteChat(chatId);
   emit("deleteChat", chatId);
 };
+
+const handleOverlayClick = () => {
+  if (isMobile.value) {
+    emit("closeSidebar");
+  }
+};
 </script>
 
 <template>
   <div
-    class="flex flex-col bg-black/90 h-[100svh] w-72 min-w-[18rem] max-w-[18rem] p-3"
+    v-if="isOpen && isMobile"
+    class="fixed inset-0 bg-black/50 z-40"
+    @click="handleOverlayClick"
+  ></div>
+  <div
+    :class="[
+      'flex flex-col bg-black/90 h-[100svh] w-72 min-w-[18rem] max-w-[18rem] p-3',
+      isOpen ? 'fixed left-0 top-0 z-50' : 'hidden sm:flex',
+    ]"
   >
     <div class="flex justify-between items-center h-10 mb-4">
       <h1 class="text-lg text-white">Jun's GPT</h1>
