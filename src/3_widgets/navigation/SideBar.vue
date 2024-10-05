@@ -3,6 +3,8 @@ import { XMarkIcon } from "@heroicons/vue/24/solid";
 import { useDeleteChatMutation } from "@/4_features/chat/api/mutation";
 import { useWindowSize } from "@vueuse/core";
 import { computed } from "vue";
+import { useAuth } from "@/6_shared/composables/useAuth";
+import { useRouter } from "vue-router";
 
 defineProps<{
   chatData: any;
@@ -30,55 +32,102 @@ const handleDeleteChat = async (chatId: string, event: Event) => {
 };
 
 const handleOverlayClick = () => {
-  if (isMobile.value) {
-    emit("closeSidebar");
-  }
+  emit("closeSidebar");
+};
+
+const { isAuthenticated, logout } = useAuth();
+const router = useRouter();
+
+const handleLogout = async () => {
+  await logout();
+  router.push("/login");
 };
 </script>
 
 <template>
-  <div
-    v-if="isOpen && isMobile"
-    class="fixed inset-0 bg-black/50 z-40"
-    @click="handleOverlayClick"
-  ></div>
-  <div
-    :class="[
-      'flex flex-col bg-black/90 h-[100svh] w-72 min-w-[18rem] max-w-[18rem] p-3',
-      isOpen ? 'fixed left-0 top-0 z-50' : 'hidden sm:flex',
-    ]"
-  >
-    <div class="flex justify-between items-center h-10 mb-4">
-      <h1 class="text-lg text-white">Jun's GPT</h1>
-      <XMarkIcon
-        v-if="isMobile"
-        @click="emit('closeSidebar')"
-        class="h-6 w-6 text-white cursor-pointer"
-      />
-    </div>
-
+  <Transition name="fade">
     <div
-      v-for="chat in chatData"
-      :key="chat.id"
-      @click="selectChat(chat.id)"
-      class="p-2 bg-transparent hover:bg-gray-400/10 rounded-md cursor-pointer text-white flex justify-between items-center"
+      v-if="isOpen && isMobile"
+      class="fixed inset-0 bg-black/50 z-40"
+      @click="handleOverlayClick"
+    ></div>
+  </Transition>
+  <Transition name="slide">
+    <div
+      v-if="isOpen || !isMobile"
+      :class="[
+        'fixed inset-y-0 left-0 flex flex-col bg-black/90 w-72 min-w-[18rem] max-w-[18rem] p-3 z-50',
+        { 'sm:relative': !isMobile },
+      ]"
     >
-      <span>{{ chat.title }}</span>
-      <XMarkIcon
-        @click="handleDeleteChat(chat.id, $event)"
-        class="h-5 w-5 text-gray-400 hover:text-white cursor-pointer"
-      />
+      <div class="flex justify-between items-center h-10 mb-4">
+        <h1 class="text-lg text-white">Jun's GPT</h1>
+        <XMarkIcon
+          v-if="isMobile"
+          @click="emit('closeSidebar')"
+          class="h-6 w-6 text-white cursor-pointer"
+        />
+      </div>
+
+      <div
+        v-for="chat in chatData"
+        :key="chat.id"
+        @click="selectChat(chat.id)"
+        class="p-2 bg-transparent hover:bg-gray-400/10 rounded-md cursor-pointer text-white flex justify-between items-center"
+      >
+        <span>{{ chat.title }}</span>
+        <XMarkIcon
+          @click="handleDeleteChat(chat.id, $event)"
+          class="h-5 w-5 text-gray-400 hover:text-white cursor-pointer"
+        />
+      </div>
+
+      <div class="grow" />
+
+      <button
+        @click="selectChat(null)"
+        class="p-2 bg-gray-400/40 rounded-md text-white"
+      >
+        새 채팅
+      </button>
     </div>
-
-    <div class="grow" />
-
+  </Transition>
+  <div class="mt-auto">
     <button
-      @click="selectChat(null)"
-      class="p-2 bg-gray-400/40 rounded-md text-white"
+      v-if="isAuthenticated"
+      @click="handleLogout"
+      class="p-2 bg-red-500 text-white rounded-md w-full"
     >
-      새 채팅
+      로그아웃
     </button>
+    <router-link
+      v-else
+      to="/login"
+      class="p-2 bg-blue-500 text-white rounded-md block text-center"
+    >
+      로그인
+    </router-link>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(-100%);
+}
+</style>

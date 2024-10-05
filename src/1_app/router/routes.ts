@@ -1,9 +1,21 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { auth } from "@/server/firebase";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
+    name: "login",
+    component: () => import("@/3_widgets/login/LoginForm.vue"),
+  },
+  {
+    path: "/signup",
+    name: "signup",
+    component: () => import("@/3_widgets/login/SignupForm.vue"),
+  },
+  {
+    path: "/home",
     component: () => import("@/3_widgets/layout/AppLayout.vue"),
+    meta: { requiresAuth: true },
     children: [
       {
         path: "",
@@ -22,6 +34,17 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth);
+  const isAuthenticated = auth.currentUser;
+
+  if (requiresAuth && !isAuthenticated) {
+    next("/login");
+  } else {
+    next();
+  }
 });
 
 export default router;
