@@ -63,7 +63,6 @@ export const useSelectedChatQuery = (
     queryFn: async () => {
       if (id.value !== null) {
         const result = await getDBSelectedChat(id.value);
-        console.log("Selected chat:", result);
         return result;
       }
       console.log("No chat ID provided");
