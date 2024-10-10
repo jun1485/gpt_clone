@@ -65,7 +65,6 @@ export const useSelectedChatQuery = (
         const result = await getDBSelectedChat(id.value);
         return result;
       }
-      console.log("No chat ID provided");
       return null;
     },
     enabled: !!id.value,
