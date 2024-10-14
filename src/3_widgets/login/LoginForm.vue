@@ -12,8 +12,10 @@ const router = useRouter();
 const login = async () => {
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value);
-    router.push("/");
+    router.push("/home");
   } catch (e) {
+    console.log(e);
+
     error.value = "로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.";
   }
 };
