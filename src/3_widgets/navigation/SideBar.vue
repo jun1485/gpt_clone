@@ -86,28 +86,20 @@ const handleLogout = async () => {
 
       <button
         @click="selectChat(null)"
-        class="p-2 bg-gray-400/40 rounded-md text-white"
+        class="p-2 bg-gray-400/40 rounded-md text-white mb-2"
       >
         새 채팅
       </button>
+
+      <button
+        v-if="isAuthenticated"
+        @click="handleLogout"
+        class="p-2 bg-red-500 text-white rounded-md w-full"
+      >
+        로그아웃
+      </button>
     </div>
   </Transition>
-  <div class="mt-auto">
-    <button
-      v-if="isAuthenticated"
-      @click="handleLogout"
-      class="p-2 bg-red-500 text-white rounded-md w-full"
-    >
-      로그아웃
-    </button>
-    <router-link
-      v-else
-      to="/login"
-      class="p-2 bg-blue-500 text-white rounded-md block text-center"
-    >
-      로그인
-    </router-link>
-  </div>
 </template>
 
 <style scoped>
