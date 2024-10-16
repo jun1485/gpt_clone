@@ -5,21 +5,22 @@ import { User, onAuthStateChanged, signOut } from "firebase/auth";
 export function useAuth() {
   const user = ref<User | null>(null);
   const isAuthenticated = ref(false);
+  const userId = ref<string | null>(null);
+  const isLoading = ref(true);
 
   const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
     user.value = currentUser;
     isAuthenticated.value = !!currentUser;
+    userId.value = currentUser ? currentUser.uid : null;
+    isLoading.value = false;
     if (currentUser) {
-      // 사용자가 인증되면 localStorage에 표시를 저장합니다.
       localStorage.setItem("isLoggedIn", "true");
     } else {
-      // 로그아웃 시 localStorage에서 제거합니다.
       localStorage.removeItem("isLoggedIn");
     }
   });
 
   onMounted(() => {
-    // 컴포넌트 마운트 시 localStorage를 확인하여 로그인 상태를 복원합니다.
     const isLoggedIn = localStorage.getItem("isLoggedIn");
     if (isLoggedIn === "true") {
       isAuthenticated.value = true;
@@ -39,5 +40,5 @@ export function useAuth() {
     }
   };
 
-  return { user, isAuthenticated, logout };
+  return { user, isAuthenticated, userId, isLoading, logout };
 }

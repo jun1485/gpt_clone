@@ -9,6 +9,9 @@ import {
   setDoc,
   deleteDoc,
 } from "firebase/firestore";
+import { useAuth } from "@/6_shared/composables/useAuth";
+
+const { userId } = useAuth();
 
 interface AddMessageParams {
   chatID: string;
@@ -16,7 +19,8 @@ interface AddMessageParams {
 }
 
 const addNewChatToDB = async (newChat: ChatType): Promise<string> => {
-  const chatCollection = collection(db, "chats");
+  if (!userId.value) throw new Error("User not authenticated");
+  const chatCollection = collection(db, `users/${userId.value}/chats`);
   const docRef = doc(chatCollection, newChat.id);
   await setDoc(docRef, newChat);
   return newChat.id;
@@ -30,7 +34,7 @@ export const useAddChatMutation = (): UseMutationReturnType<
 > => {
   return useMutation({
     mutationFn: addNewChatToDB,
-    mutationKey: ["addChat"],
+    mutationKey: ["addChat", userId],
   });
 };
 
@@ -38,7 +42,8 @@ const addMessageToChat = async ({
   chatID,
   message,
 }: AddMessageParams): Promise<void> => {
-  const chatRef = doc(db, "chats", chatID);
+  if (!userId.value) throw new Error("User not authenticated");
+  const chatRef = doc(db, `users/${userId.value}/chats`, chatID);
   await updateDoc(chatRef, {
     messages: arrayUnion(message),
   });
@@ -52,12 +57,13 @@ export const useAddMessageMutation = (): UseMutationReturnType<
 > => {
   return useMutation({
     mutationFn: addMessageToChat,
-    mutationKey: ["addMessage"],
+    mutationKey: ["addMessage", userId],
   });
 };
 
 const deleteChatFromDB = async (chatID: string): Promise<void> => {
-  const chatRef = doc(db, "chats", chatID);
+  if (!userId.value) throw new Error("User not authenticated");
+  const chatRef = doc(db, `users/${userId.value}/chats`, chatID);
   await deleteDoc(chatRef);
 };
 
@@ -69,6 +75,6 @@ export const useDeleteChatMutation = (): UseMutationReturnType<
 > => {
   return useMutation({
     mutationFn: deleteChatFromDB,
-    mutationKey: ["deleteChat"],
+    mutationKey: ["deleteChat", userId],
   });
 };
