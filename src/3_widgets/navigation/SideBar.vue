@@ -56,48 +56,52 @@ const handleLogout = async () => {
     <div
       v-if="isOpen || !isMobile"
       :class="[
-        'fixed inset-y-0 left-0 flex flex-col bg-black/90 w-72 min-w-[18rem] max-w-[18rem] p-3 z-50',
-        { 'sm:relative': !isMobile },
+        'fixed inset-0 flex flex-col bg-black/90 p-3 z-50',
+        {
+          'sm:inset-y-0 sm:left-0 sm:w-72 sm:min-w-[18rem] sm:max-w-[18rem]':
+            !isMobile,
+        },
       ]"
     >
       <div class="flex justify-between items-center h-10 mb-4">
         <h1 class="text-lg text-white">Jun's GPT</h1>
         <XMarkIcon
-          v-if="isMobile"
           @click="emit('closeSidebar')"
           class="h-6 w-6 text-white cursor-pointer"
         />
       </div>
 
-      <div
-        v-for="chat in chatData"
-        :key="chat.id"
-        @click="selectChat(chat.id)"
-        class="p-2 bg-transparent hover:bg-gray-400/10 rounded-md cursor-pointer text-white flex justify-between items-center"
-      >
-        <span>{{ chat.title }}</span>
-        <XMarkIcon
-          @click="handleDeleteChat(chat.id, $event)"
-          class="h-5 w-5 text-gray-400 hover:text-white cursor-pointer"
-        />
+      <div class="overflow-y-auto flex-grow">
+        <div
+          v-for="chat in chatData"
+          :key="chat.id"
+          @click="selectChat(chat.id)"
+          class="p-2 bg-transparent hover:bg-gray-400/10 rounded-md cursor-pointer text-white flex justify-between items-center mb-2"
+        >
+          <span>{{ chat.title }}</span>
+          <XMarkIcon
+            @click="handleDeleteChat(chat.id, $event)"
+            class="h-5 w-5 text-gray-400 hover:text-white cursor-pointer"
+          />
+        </div>
       </div>
 
-      <div class="grow" />
+      <div class="mt-auto">
+        <button
+          @click="selectChat(null)"
+          class="p-2 bg-gray-400/40 rounded-md text-white mb-2 w-full"
+        >
+          새 채팅
+        </button>
 
-      <button
-        @click="selectChat(null)"
-        class="p-2 bg-gray-400/40 rounded-md text-white mb-2"
-      >
-        새 채팅
-      </button>
-
-      <button
-        v-if="isAuthenticated"
-        @click="handleLogout"
-        class="p-2 bg-red-500 text-white rounded-md w-full"
-      >
-        로그아웃
-      </button>
+        <button
+          v-if="isAuthenticated"
+          @click="handleLogout"
+          class="p-2 bg-red-500 text-white rounded-md w-full"
+        >
+          로그아웃
+        </button>
+      </div>
     </div>
   </Transition>
 </template>
