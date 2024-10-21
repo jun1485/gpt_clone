@@ -38,14 +38,15 @@ watch(chatData, () => {
 
 const { width } = useWindowSize();
 const isMobile = computed(() => width.value < 640);
-const isSidebarOpen = ref(!isMobile.value);
+const isTablet = computed(() => width.value >= 640 && width.value < 1024);
+const isSidebarOpen = ref(!isMobile.value && !isTablet.value);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
 
 const closeSidebar = () => {
-  if (isMobile.value) {
+  if (isMobile.value || isTablet.value) {
     isSidebarOpen.value = false;
   }
 };
@@ -55,7 +56,7 @@ const closeSidebar = () => {
   <div class="flex h-screen overflow-hidden">
     <!-- 햄버거 메뉴 아이콘 (모바일) -->
     <button
-      v-if="isMobile"
+      v-if="isMobile || isTablet"
       @click="toggleSidebar"
       class="fixed top-4 left-4 z-50"
     >
@@ -69,6 +70,7 @@ const closeSidebar = () => {
       @select-chat="chatSelected"
       @delete-chat="handleDeleteChat"
       @close-sidebar="closeSidebar"
+      :class="{ 'hidden sm:block': !isSidebarOpen && !isMobile && !isTablet }"
     />
 
     <!-- 메인 콘텐츠 -->
