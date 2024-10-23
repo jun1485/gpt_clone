@@ -54,7 +54,7 @@ const closeSidebar = () => {
 
 <template>
   <div class="flex h-screen overflow-hidden">
-    <!-- 햄버거 메뉴 아이콘 (모바일) -->
+    <!-- 햄버거 메뉴 아이콘 (모바일 및 태블릿) -->
     <button
       v-if="isMobile || isTablet"
       @click="toggleSidebar"
@@ -64,23 +64,37 @@ const closeSidebar = () => {
     </button>
 
     <!-- 사이드바 -->
-    <SideBar
-      :chatData="chatData"
-      :isOpen="isSidebarOpen"
-      @select-chat="chatSelected"
-      @delete-chat="handleDeleteChat"
-      @close-sidebar="closeSidebar"
-      :class="{ 'hidden sm:block': !isSidebarOpen && !isMobile && !isTablet }"
-    />
+    <div
+      :class="[
+        'fixed inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out transform',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        isMobile || isTablet ? 'w-64' : 'w-64 sm:relative sm:translate-x-0',
+      ]"
+    >
+      <SideBar
+        :chatData="chatData"
+        :isOpen="isSidebarOpen"
+        @select-chat="chatSelected"
+        @delete-chat="handleDeleteChat"
+        @close-sidebar="closeSidebar"
+      />
+    </div>
 
     <!-- 메인 콘텐츠 -->
-    <main class="flex-grow overflow-auto">
+    <main class="flex-grow overflow-auto w-full sm:ml-64">
       <router-view
         :key="$route.fullPath"
         v-model:chatID="selectedChatID"
         @refetch-chat-list="refreshChatList"
       />
     </main>
+
+    <!-- 오버레이 (모바일 및 태블릿에서 사이드바가 열렸을 때) -->
+    <div
+      v-if="(isMobile || isTablet) && isSidebarOpen"
+      class="fixed inset-0 bg-black bg-opacity-50 z-30"
+      @click="closeSidebar"
+    ></div>
   </div>
 </template>
 
