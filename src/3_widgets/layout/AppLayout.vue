@@ -68,7 +68,11 @@ const closeSidebar = () => {
       :class="[
         'fixed inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out transform',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-        isMobile || isTablet ? 'w-64' : 'w-64 sm:relative sm:translate-x-0',
+        isMobile
+          ? 'w-full'
+          : isTablet
+          ? 'w-64'
+          : 'w-64 sm:relative sm:translate-x-0',
       ]"
     >
       <SideBar
@@ -94,7 +98,7 @@ const closeSidebar = () => {
       v-if="(isMobile || isTablet) && isSidebarOpen"
       class="fixed inset-0 bg-black bg-opacity-50 z-30"
       @click="closeSidebar"
-    ></div>
+    />
   </div>
 </template>
 
