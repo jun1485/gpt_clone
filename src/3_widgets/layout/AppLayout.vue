@@ -56,7 +56,7 @@ const closeSidebar = () => {
   <div class="flex h-screen overflow-hidden">
     <!-- 햄버거 메뉴 아이콘 (모바일 및 태블릿) -->
     <button
-      v-if="isMobile || isTablet"
+      v-if="isMobile"
       @click="toggleSidebar"
       class="fixed top-4 left-4 z-50"
     >
