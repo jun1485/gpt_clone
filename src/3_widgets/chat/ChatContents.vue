@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import {
   useAddChatMutation,
   useAddMessageMutation,
 } from "@/4_features/chat/api/mutation";
 import { useSelectedChatQuery } from "@/4_features/chat/api/query";
 import { ChatType, MessageType } from "@/5_entities/chat/model/type";
-import { ref } from "vue";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import InputMessage from "@/6_shared/ui/InputMessage.vue";
@@ -41,26 +40,31 @@ const pendingGPTResponse = ref("");
 const isTyping = ref(false);
 const typedResponse = ref("");
 
-const currentChat = computed(() => selectedChatData.value);
+const currentChatMessages = ref<MessageType[]>([]);
+
+watchEffect(() => {
+  if (selectedChatData.value) {
+    currentChatMessages.value = [...selectedChatData.value.messages];
+  } else {
+    currentChatMessages.value = [];
+  }
+});
 
 const currentChatWithPendingResponse = computed(() => {
-  if (!currentChat.value || !isWaitingForResponse.value) {
-    return currentChat.value;
+  if (!isWaitingForResponse.value) {
+    return currentChatMessages.value;
   }
 
-  return {
-    ...currentChat.value,
-    messages: [
-      ...currentChat.value.messages,
-      {
-        id: "pending-gpt-response",
-        content: isTyping.value
-          ? typedResponse.value
-          : "GPT가 응답을 생성하고 있습니다...",
-        timestamp: new Date().toISOString(),
-      },
-    ],
-  };
+  return [
+    ...currentChatMessages.value,
+    {
+      id: "pending-gpt-response",
+      content: isTyping.value
+        ? typedResponse.value
+        : "GPT가 응답을 생성하고 있습니다...",
+      timestamp: new Date().toISOString(),
+    },
+  ];
 });
 
 const callGPTAPI = async (message: string): Promise<string> => {
@@ -124,7 +128,7 @@ const typeResponse = async (text: string) => {
 const handleSendMessage = async (message: string) => {
   if (message !== "") {
     const userMessage: MessageType = {
-      id: `user-${uuidv4()}`, // 사용자 메시지 ID에 'user-' 접두사 추가
+      id: `user-${uuidv4()}`,
       content: message,
       timestamp: new Date().toISOString(),
     };
@@ -146,6 +150,9 @@ const handleSendMessage = async (message: string) => {
         await addMessage({ chatID: currentChatID, message: userMessage });
       }
 
+      // 사용자 메시지를 즉시 로컬 상태에 추가
+      currentChatMessages.value.push(userMessage);
+
       await refetchSelectedChat();
       emit("refetch-chat-list");
 
@@ -156,12 +163,16 @@ const handleSendMessage = async (message: string) => {
       const gptResponse = await callGPTAPI(userMessage.content);
 
       const gptMessage: MessageType = {
-        id: `gpt-${uuidv4()}`, // GPT 메시지 ID에 'gpt-' 접두사 추가
+        id: `gpt-${uuidv4()}`,
         content: gptResponse,
         timestamp: new Date().toISOString(),
       };
 
       await addMessage({ chatID: currentChatID, message: gptMessage });
+
+      // GPT 응답을 즉시 로컬 상태에 추가
+      currentChatMessages.value.push(gptMessage);
+
       await refetchSelectedChat();
     } catch (error) {
       console.error("메시지 전송 또는 GPT 응답 처리 중 오류 발생:", error);
@@ -200,7 +211,7 @@ const isMobile = computed(() => width.value < 640);
     </div>
     <div v-else class="flex flex-col gap-2 sm:gap-4 overflow-y-auto">
       <div
-        v-for="message in currentChatWithPendingResponse.messages"
+        v-for="message in currentChatWithPendingResponse"
         :key="message.id"
         class="flex"
         :class="{
