@@ -55,16 +55,16 @@ const currentChatWithPendingResponse = computed(() => {
     return currentChatMessages.value;
   }
 
-  return [
-    ...currentChatMessages.value,
-    {
-      id: "pending-gpt-response",
-      content: isTyping.value
-        ? typedResponse.value
-        : "GPT가 응답을 생성하고 있습니다...",
-      timestamp: new Date().toISOString(),
-    },
-  ];
+  const messages = [...currentChatMessages.value];
+  messages.push({
+    id: "pending-gpt-response",
+    content: isTyping.value
+      ? typedResponse.value
+      : "GPT가 응답을 생성하고 있습니다...",
+    timestamp: new Date().toISOString(),
+  });
+
+  return messages;
 });
 
 const callGPTAPI = async (message: string): Promise<string> => {
@@ -204,7 +204,9 @@ const isMobile = computed(() => width.value < 640);
       <p>오류: {{ error }}</p>
     </div>
     <div
-      v-else-if="!currentChatWithPendingResponse"
+      v-else-if="
+        !currentChatWithPendingResponse.length && !isWaitingForResponse
+      "
       class="mx-auto text-sm sm:text-base"
     >
       <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
