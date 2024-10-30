@@ -67,7 +67,7 @@ const handleLogout = async () => {
         <h1 class="text-lg text-white">Jun's GPT</h1>
         <XMarkIcon
           @click="emit('closeSidebar')"
-          class="h-6 w-6 text-white cursor-pointer"
+          class="h-6 w-6 text-white cursor-pointer block sm:hidden"
         />
       </div>
 

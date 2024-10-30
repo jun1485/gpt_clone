@@ -135,6 +135,15 @@ const handleSendMessage = async (message: string) => {
 
     try {
       let currentChatID = chatID.value;
+
+      // 사용자 메시지를 즉시 로컬 상태에 추가
+      currentChatMessages.value.push(userMessage);
+
+      // GPT API 호출 준비
+      isWaitingForResponse.value = true;
+      pendingGPTResponse.value = "";
+      typedResponse.value = "";
+
       if (!currentChatID) {
         const newChat: ChatType = {
           id: uuidv4(),
@@ -145,21 +154,16 @@ const handleSendMessage = async (message: string) => {
         currentChatID = newChat.id;
         chatID.value = currentChatID;
 
+        // 라우팅을 GPT 응답 후로 이동
         router.push({ path: `/chat/${currentChatID}` });
       } else {
         await addMessage({ chatID: currentChatID, message: userMessage });
       }
 
-      // 사용자 메시지를 즉시 로컬 상태에 추가
-      currentChatMessages.value.push(userMessage);
-
       await refetchSelectedChat();
       emit("refetch-chat-list");
 
       // GPT API 호출
-      isWaitingForResponse.value = true;
-      pendingGPTResponse.value = "";
-      typedResponse.value = "";
       const gptResponse = await callGPTAPI(userMessage.content);
 
       const gptMessage: MessageType = {
