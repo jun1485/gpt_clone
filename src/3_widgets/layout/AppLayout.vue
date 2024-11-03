@@ -66,9 +66,9 @@ const closeSidebar = () => {
     <!-- 사이드바 -->
     <div
       :class="[
-        'fixed inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out transform w-64 shrink-0',
+        'fixed inset-y-0 left-0 z-40 transition-transform duration-300 ease-in-out transform w-72 flex-shrink-0',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-[calc(100%+1rem)]',
-        isMobile ? 'w-full' : isTablet ? '' : ' sm:relative sm:translate-x-0',
+        isMobile ? 'w-full' : isTablet ? '' : ' xs:relative xs:translate-x-0',
       ]"
     >
       <SideBar
@@ -81,7 +81,12 @@ const closeSidebar = () => {
     </div>
 
     <!-- 메인 콘텐츠 -->
-    <main class="flex-grow overflow-auto w-full xs:ml-64">
+    <main
+      :class="[
+        'flex-grow overflow-auto w-full transition-all duration-300 ease-in-out',
+        isMobile ? '' : isTablet ? 'ml-0' : 'sm:ml-72',
+      ]"
+    >
       <router-view
         :key="$route.fullPath"
         v-model:chatID="selectedChatID"
