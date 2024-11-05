@@ -37,8 +37,8 @@ watch(chatData, () => {
 });
 
 const { width } = useWindowSize();
-const isMobile = computed(() => width.value < 640);
-const isTablet = computed(() => width.value >= 640 && width.value < 1024);
+const isMobile = computed(() => width.value < 768);
+const isTablet = computed(() => width.value >= 768 && width.value < 1024);
 const isSidebarOpen = ref(!isMobile.value && !isTablet.value);
 
 const toggleSidebar = () => {
@@ -56,9 +56,8 @@ const closeSidebar = () => {
   <div class="flex h-screen overflow-hidden">
     <!-- 햄버거 메뉴 아이콘 (모바일 및 태블릿) -->
     <button
-      v-if="isMobile"
       @click="toggleSidebar"
-      class="fixed top-4 left-4 z-50"
+      class="fixed top-4 left-4 z-50 block lg:hidden"
     >
       <Bars3Icon class="h-6 w-6 text-gray-500" />
     </button>
