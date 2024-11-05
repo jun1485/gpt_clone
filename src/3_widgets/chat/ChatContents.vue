@@ -197,10 +197,6 @@ const isMobile = computed(() => width.value < 640);
   <div
     class="flex flex-col gap-3 px-2 sm:px-6 py-2 sm:py-4 w-full h-full justify-between"
   >
-    <h1 class="text-lg sm:text-xl text-center sm:text-left mb-2 sm:mb-0">
-      My GPT
-    </h1>
-
     <div v-if="isLoading" class="mx-auto">
       <p>로딩 중...</p>
     </div>
@@ -213,7 +209,7 @@ const isMobile = computed(() => width.value < 640);
       "
       class="mx-auto text-sm sm:text-base"
     >
-      <p>새로운 대화를 시작하거나 채팅을 선택하세요!</p>
+      <p class="mt-10">새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
     <div v-else class="flex flex-col gap-2 sm:gap-4 overflow-y-auto">
       <div
