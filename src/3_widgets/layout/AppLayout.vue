@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { SideBar } from "@/3_widgets/navigation";
 import { useChatQuery } from "@/4_features/chat/api/query";
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Bars3Icon } from "@heroicons/vue/24/solid";
-import { useWindowSize } from "@vueuse/core";
+import { useResponsive } from "@/6_shared/composables/useResponsive";
 
 const router = useRouter();
 const { data: chatData, refetch: refetchChatData } = useChatQuery();
@@ -36,9 +36,8 @@ watch(chatData, () => {
     selectedChatID.value = chatData.value[0].id;
 });
 
-const { width } = useWindowSize();
-const isMobile = computed(() => width.value < 768);
-const isTablet = computed(() => width.value >= 768 && width.value < 1024);
+const { isMobile, isTablet } = useResponsive();
+
 const isSidebarOpen = ref(!isMobile.value && !isTablet.value);
 
 const toggleSidebar = () => {
