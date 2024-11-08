@@ -53,12 +53,12 @@ const closeSidebar = () => {
 
 <template>
   <div class="flex h-screen overflow-hidden">
-    <!-- 햄버거 메뉴 아이콘 (모바일 및 태블릿) -->
+    <!-- hamburger 메뉴 아이콘 (모바일 및 태블릿) -->
     <button
       @click="toggleSidebar"
       class="fixed top-4 left-4 z-50 block lg:hidden"
     >
-      <Bars3Icon class="h-6 w-6 text-gray-500" />
+      <Bars3Icon v-if="!isSidebarOpen" class="h-6 w-6 text-gray-500" />
     </button>
 
     <!-- 사이드바 -->
@@ -82,7 +82,7 @@ const closeSidebar = () => {
     <main
       :class="[
         'flex-grow overflow-auto w-full transition-all duration-300 ease-in-out',
-        isMobile ? '' : isTablet ? 'ml-0' : 'sm:ml-72',
+        isMobile ? '' : isTablet ? 'ml-0' : 'xl:ml-72',
       ]"
     >
       <router-view
