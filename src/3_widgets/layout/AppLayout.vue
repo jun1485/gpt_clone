@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SideBar } from "@/3_widgets/navigation";
 import { useChatQuery } from "@/4_features/chat/api/query";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Bars3Icon } from "@heroicons/vue/24/solid";
 import { useResponsive } from "@/6_shared/composables/useResponsive";
@@ -39,6 +39,22 @@ watch(chatData, () => {
 const { isMobile, isTablet } = useResponsive();
 
 const isSidebarOpen = ref(!isMobile.value && !isTablet.value);
+
+const lgMediaQuery = window.matchMedia("(min-width: 1280px)");
+
+// 미디어쿼리 변경 감지 핸들러
+const handleResize = (e: MediaQueryListEvent | MediaQueryList) => {
+  isSidebarOpen.value = e.matches;
+};
+
+onMounted(() => {
+  handleResize(lgMediaQuery);
+  lgMediaQuery.addEventListener("change", handleResize);
+});
+
+onUnmounted(() => {
+  lgMediaQuery.removeEventListener("change", handleResize);
+});
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -82,7 +98,7 @@ const closeSidebar = () => {
     <main
       :class="[
         'flex-grow overflow-auto w-full transition-all duration-300 ease-in-out',
-        isMobile ? '' : isTablet ? 'ml-0' : 'xl:ml-72',
+        isMobile ? '' : isTablet ? 'ml-0' : 'ml-72',
       ]"
     >
       <router-view
