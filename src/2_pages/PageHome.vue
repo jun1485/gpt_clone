@@ -13,8 +13,13 @@ const refreshChatList = async () => {
 };
 
 watch(chatData, () => {
-  if (chatData.value && chatData.value.length > 0)
+  if (
+    (selectedChatID.value === null || selectedChatID.value === undefined) &&
+    chatData.value &&
+    chatData.value.length > 0
+  ) {
     selectedChatID.value = chatData.value[0].id;
+  }
 });
 </script>
 
