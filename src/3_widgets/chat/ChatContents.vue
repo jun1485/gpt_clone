@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import {
   useAddChatMutation,
   useAddMessageMutation,
@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import InputMessage from "@/6_shared/ui/InputMessage.vue";
 import { useRouter } from "vue-router";
-import { useWindowSize } from "@vueuse/core";
+import { useResponsive } from "@/6_shared/composables/useResponsive";
 
 const emit = defineEmits<{
   (e: "refetch-chat-list"): void;
@@ -33,7 +33,7 @@ const { mutate: addMessage, isPending: isAddingMessage } =
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const API_URL = import.meta.env.VITE_OPENAI_API_URL;
 
-const { width } = useWindowSize();
+const { isMobile } = useResponsive();
 
 const isWaitingForResponse = ref(false);
 const pendingGPTResponse = ref("");
@@ -41,14 +41,6 @@ const isTyping = ref(false);
 const typedResponse = ref("");
 
 const currentChatMessages = ref<MessageType[]>([]);
-
-watchEffect(() => {
-  if (selectedChatData.value) {
-    currentChatMessages.value = [...selectedChatData.value.messages];
-  } else {
-    currentChatMessages.value = [];
-  }
-});
 
 const currentChatWithPendingResponse = computed(() => {
   if (!isWaitingForResponse.value) {
@@ -190,7 +182,13 @@ const handleSendMessage = async (message: string) => {
   }
 };
 
-const isMobile = computed(() => width.value < 640);
+watchEffect(() => {
+  if (selectedChatData.value) {
+    currentChatMessages.value = [...selectedChatData.value.messages];
+  } else {
+    currentChatMessages.value = [];
+  }
+});
 </script>
 
 <template>
