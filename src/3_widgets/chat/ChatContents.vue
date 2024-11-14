@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import {
   useAddChatMutation,
   useAddMessageMutation,
@@ -189,6 +189,27 @@ watchEffect(() => {
     currentChatMessages.value = [];
   }
 });
+
+const messageContainer = ref<HTMLElement | null>(null);
+
+const scrollToBottom = () => {
+  if (messageContainer.value) {
+    messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
+  }
+};
+
+// currentChatMessages가 변경될 때마다 스크롤
+watch(currentChatMessages, () => {
+  nextTick(() => {
+    scrollToBottom();
+  });
+});
+
+watch(typedResponse, () => {
+  nextTick(() => {
+    scrollToBottom();
+  });
+});
 </script>
 
 <template>
@@ -209,7 +230,11 @@ watchEffect(() => {
     >
       <p class="mt-10">새로운 대화를 시작하거나 채팅을 선택하세요!</p>
     </div>
-    <div v-else class="flex flex-col gap-2 sm:gap-4 overflow-y-auto">
+    <div
+      v-else
+      ref="messageContainer"
+      class="flex flex-col gap-2 sm:gap-4 overflow-y-auto"
+    >
       <div
         v-for="message in currentChatWithPendingResponse"
         :key="message.id"
