@@ -92,7 +92,7 @@ const closeSidebar = () => {
     >
       <SideBar
         :chatData="chatData"
-        :isOpen="isSidebarOpen"
+        v-model:isOpen="isSidebarOpen"
         @select-chat="chatSelected"
         @delete-chat="handleDeleteChat"
         @close-sidebar="closeSidebar"

@@ -1,26 +1,34 @@
 <script setup lang="ts">
 import { XMarkIcon } from "@heroicons/vue/24/solid";
 import { useDeleteChatMutation } from "@/4_features/chat/api/mutation";
-import { useWindowSize } from "@vueuse/core";
-import { computed } from "vue";
 import { useAuth } from "@/6_shared/composables/useAuth";
 import { useRouter } from "vue-router";
+import { useResponsive } from "@/6_shared/composables/useResponsive";
 
 defineProps<{
   chatData: any;
-  isOpen: boolean;
 }>();
+
+const isOpen = defineModel<boolean>("isOpen");
 
 const emit = defineEmits(["selectChat", "deleteChat", "closeSidebar"]);
 
-const { width } = useWindowSize();
-const isMobile = computed(() => width.value < 640);
+const isMobile = useResponsive();
 
 const selectChat = (chatId: number | null) => {
   emit("selectChat", chatId);
-  if (isMobile.value) {
+  if (isMobile) {
+    emit("closeSidebar");
+    isOpen.value = false;
+  }
+};
+
+const goToHome = () => {
+  emit("selectChat", null);
+  if (isMobile) {
     emit("closeSidebar");
   }
+  router.push({ name: "home" });
 };
 
 const { mutate: deleteChat } = useDeleteChatMutation();
@@ -88,7 +96,7 @@ const handleLogout = async () => {
 
       <div class="mt-auto">
         <button
-          @click="selectChat(null)"
+          @click="goToHome()"
           class="p-2 bg-gray-400/40 rounded-md text-white mb-2 w-full"
         >
           새 채팅
