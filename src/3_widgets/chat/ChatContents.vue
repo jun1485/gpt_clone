@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch, watchEffect } from "vue";
+import { computed, nextTick, ref, watch, watchEffect, onMounted } from "vue";
 import {
   useAddChatMutation,
   useAddMessageMutation,
@@ -198,13 +198,21 @@ const scrollToBottom = () => {
   }
 };
 
-// currentChatMessages가 변경될 때마다 스크롤
+// 컴포넌트가 마운트될 때 스크롤
+onMounted(() => {
+  nextTick(() => {
+    scrollToBottom();
+  });
+});
+
+// 메시지가 변경될 때 스크롤
 watch(currentChatMessages, () => {
   nextTick(() => {
     scrollToBottom();
   });
 });
 
+// 타이핑 응답이 업데이트될 때 스크롤
 watch(typedResponse, () => {
   nextTick(() => {
     scrollToBottom();
@@ -214,7 +222,7 @@ watch(typedResponse, () => {
 
 <template>
   <div
-    class="flex flex-col gap-3 px-2 sm:px-6 py-2 sm:py-4 w-full h-full justify-between"
+    class="flex flex-col gap-3 pl-4 py-2 sm:py-4 w-full h-full justify-between"
   >
     <div v-if="isLoading" class="mx-auto">
       <p>로딩 중...</p>
@@ -233,7 +241,7 @@ watch(typedResponse, () => {
     <div
       v-else
       ref="messageContainer"
-      class="flex flex-col gap-2 sm:gap-4 overflow-y-auto"
+      class="flex flex-col gap-2 sm:gap-4 overflow-y-auto pr-2 md:pr-6"
     >
       <div
         v-for="message in currentChatWithPendingResponse"
