@@ -13,11 +13,11 @@ const isOpen = defineModel<boolean>("isOpen");
 
 const emit = defineEmits(["selectChat", "deleteChat", "closeSidebar"]);
 
-const isMobile = useResponsive();
+const { isMobile, isTablet } = useResponsive();
 
 const selectChat = (chatId: number | null) => {
   emit("selectChat", chatId);
-  if (isMobile) {
+  if (isTablet.value) {
     emit("closeSidebar");
     isOpen.value = false;
   }
@@ -25,7 +25,7 @@ const selectChat = (chatId: number | null) => {
 
 const goToHome = () => {
   emit("selectChat", null);
-  if (isMobile) {
+  if (isTablet) {
     emit("closeSidebar");
   }
   router.push({ name: "home" });
