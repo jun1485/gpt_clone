@@ -275,18 +275,19 @@ watch(typedResponse, () => {
 
     <div class="grow" />
 
-    <InputMessage
-      @send="handleSendMessage"
-      :disabled="isAddingMessage || isAddingChat || isWaitingForResponse"
-      class="mt-2 sm:mt-4"
-      :placeholder="isMobile ? '메시지 입력...' : '메시지를 입력하세요'"
-    />
     <div
       v-if="isWaitingForResponse"
       class="text-center mt-1 sm:mt-2 text-xs sm:text-sm"
     >
       GPT 응답을 기다리는 중...
     </div>
+
+    <InputMessage
+      @send="handleSendMessage"
+      :disabled="isAddingMessage || isAddingChat || isWaitingForResponse"
+      class="mt-2 sm:mt-4"
+      :placeholder="isMobile ? '메시지 입력...' : '메시지를 입력하세요'"
+    />
   </div>
 </template>
 
