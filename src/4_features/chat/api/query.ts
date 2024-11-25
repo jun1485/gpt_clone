@@ -7,8 +7,6 @@ import {
   DocumentData,
   getDoc,
   getDocs,
-  query,
-  where,
 } from "firebase/firestore";
 import { db } from "@/server/firebase";
 import { useAuth } from "@/6_shared/composables/useAuth";

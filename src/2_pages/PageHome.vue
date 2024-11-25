@@ -18,7 +18,7 @@ watch(chatData, () => {
     chatData.value &&
     chatData.value.length > 0
   ) {
-    selectedChatID.value = chatData.value[0].id;
+    selectedChatID.value = undefined;
   }
 });
 </script>
