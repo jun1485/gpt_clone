@@ -56,7 +56,6 @@ export const getDBSelectedChat = async (
   if (chatSnapshot.exists()) {
     return convertToChatType(chatSnapshot);
   } else {
-    console.log(`Chat not found for ID: ${chatId}`);
     return null;
   }
 };
