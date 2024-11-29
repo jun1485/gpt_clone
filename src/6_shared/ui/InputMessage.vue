@@ -14,6 +14,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   (e: "send", message: string): void;
 }>();
+
 const inputValue = ref("");
 
 const handleSendMessage = () => {
