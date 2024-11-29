@@ -16,6 +16,7 @@ const emit = defineEmits<{
 }>();
 
 const inputValue = ref("");
+
 const handleSendMessage = () => {
   if (inputValue.value.trim() !== "") {
     emit("send", inputValue.value.trim());
