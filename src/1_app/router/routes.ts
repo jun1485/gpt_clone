@@ -3,7 +3,7 @@ import { auth } from "@/server/firebase";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
+    path: "/login",
     name: "login",
     component: () => import("@/3_widgets/login/LoginForm.vue"),
   },
