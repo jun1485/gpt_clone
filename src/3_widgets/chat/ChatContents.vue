@@ -152,9 +152,6 @@ const handleSendMessage = async (message: string) => {
         await addMessage({ chatID: currentChatID, message: userMessage });
       }
 
-      await refetchSelectedChat();
-      emit("refetch-chat-list");
-
       // GPT API 호출
       const gptResponse = await callGPTAPI(userMessage.content);
 
@@ -169,7 +166,9 @@ const handleSendMessage = async (message: string) => {
       // GPT 응답을 즉시 로컬 상태에 추가
       currentChatMessages.value.push(gptMessage);
 
+      // GPT 응답 후에 채팅 목록을 새로고침
       await refetchSelectedChat();
+      emit("refetch-chat-list");
     } catch (error) {
       console.error("메시지 전송 또는 GPT 응답 처리 중 오류 발생:", error);
       // TODO: 사용자에게 오류 메시지 표시
