@@ -29,6 +29,10 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: "/",
+    redirect: "/login",
+  },
 ];
 
 const router = createRouter({
