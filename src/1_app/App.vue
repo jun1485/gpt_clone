@@ -10,12 +10,18 @@ const router = useRouter();
 watch([isAuthenticated, isLoading], ([newIsAuthenticated, newIsLoading]) => {
   if (!newIsLoading) {
     if (newIsAuthenticated) {
-      if (router.currentRoute.value.path === "/") {
+      if (
+        router.currentRoute.value.path === "/login" ||
+        router.currentRoute.value.path === "/"
+      ) {
         router.push("/home");
       }
     } else {
-      if (router.currentRoute.value.path !== "/") {
-        router.push("/");
+      if (
+        router.currentRoute.value.path !== "/login" &&
+        router.currentRoute.value.path !== "/signup"
+      ) {
+        router.push("/login");
       }
     }
   }

@@ -23,7 +23,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/2_pages/PageHome.vue"),
       },
       {
-        path: "/chat/:id",
+        path: "chat/:id",
         name: "chat",
         component: () => import("@/2_pages/PageChat.vue"),
       },
