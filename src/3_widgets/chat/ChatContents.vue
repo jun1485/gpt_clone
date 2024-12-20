@@ -147,7 +147,7 @@ const handleSendMessage = async (message: string) => {
         chatID.value = currentChatID;
 
         // 라우팅을 GPT 응답 후로 이동
-        router.push({ path: `/chat/${currentChatID}` });
+        router.push({ path: `home/chat/${currentChatID}` });
       } else {
         await addMessage({ chatID: currentChatID, message: userMessage });
       }
@@ -275,7 +275,7 @@ watch(typedResponse, () => {
     <div class="grow" />
 
     <div
-      v-if="isWaitingForResponse"
+      v-show="isWaitingForResponse || isTyping"
       class="text-center mt-1 sm:mt-2 text-xs sm:text-sm"
     >
       GPT 응답을 기다리는 중...

@@ -7,8 +7,7 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 const chatID = ref<string | null>(route.params.id as string | null);
 
-const { data: selectedChatData, refetch: fetchSelectedChatData } =
-  useSelectedChatQuery(chatID);
+const { refetch: fetchSelectedChatData } = useSelectedChatQuery(chatID);
 
 watch(
   () => route.params.id,
