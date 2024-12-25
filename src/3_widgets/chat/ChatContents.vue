@@ -48,6 +48,7 @@ const currentChatWithPendingResponse = computed(() => {
   }
 
   const messages = [...currentChatMessages.value];
+
   messages.push({
     id: "pending-gpt-response",
     content: isTyping.value
@@ -146,7 +147,6 @@ const handleSendMessage = async (message: string) => {
         currentChatID = newChat.id;
         chatID.value = currentChatID;
 
-        // 라우팅을 GPT 응답 후로 이동
         router.push({ path: `home/chat/${currentChatID}` });
       } else {
         await addMessage({ chatID: currentChatID, message: userMessage });
