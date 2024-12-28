@@ -1,222 +1,30 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch, watchEffect, onMounted } from "vue";
-import {
-  useAddChatMutation,
-  useAddMessageMutation,
-} from "@/4_features/chat/api/mutation";
-import { useSelectedChatQuery } from "@/4_features/chat/api/query";
-import { ChatType, MessageType } from "@/5_entities/chat/model/type";
-import { v4 as uuidv4 } from "uuid";
-import axios from "axios";
+import { defineEmits } from "vue";
 import InputMessage from "@/6_shared/ui/InputMessage.vue";
-import { useRouter } from "vue-router";
-import { useResponsive } from "@/6_shared/composables/useResponsive";
+import { useChat } from "@/4_features/chat/composables/useChat";
 
 const emit = defineEmits<{
   (e: "refetch-chat-list"): void;
 }>();
 
-const router = useRouter();
-
-const chatID = defineModel<string | null>("chatID", { default: null });
-
 const {
-  data: selectedChatData,
-  refetch: refetchSelectedChat,
+  chatID,
+  selectedChatData,
+  refetchSelectedChat,
   isLoading,
   error,
-} = useSelectedChatQuery(computed(() => chatID.value));
-const { mutate: addChat, isPending: isAddingChat } = useAddChatMutation();
-const { mutate: addMessage, isPending: isAddingMessage } =
-  useAddMessageMutation();
-
-const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-const API_URL = import.meta.env.VITE_OPENAI_API_URL;
-
-const { isMobile } = useResponsive();
-
-const isWaitingForResponse = ref(false);
-const pendingGPTResponse = ref("");
-const isTyping = ref(false);
-const typedResponse = ref("");
-
-const currentChatMessages = ref<MessageType[]>([]);
-
-const currentChatWithPendingResponse = computed(() => {
-  if (!isWaitingForResponse.value) {
-    return currentChatMessages.value;
-  }
-
-  const messages = [...currentChatMessages.value];
-
-  messages.push({
-    id: "pending-gpt-response",
-    content: isTyping.value
-      ? typedResponse.value
-      : "GPT가 응답을 생성하고 있습니다...",
-    timestamp: new Date().toISOString(),
-  });
-
-  return messages;
-});
-
-const callGPTAPI = async (message: string): Promise<string> => {
-  try {
-    if (!API_URL || !API_KEY) {
-      throw new Error("API URL 또는 API 키가 설정되지 않았습니다.");
-    }
-
-    const response = await axios.post(
-      API_URL,
-      {
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: message }],
-        stream: true,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${API_KEY}`,
-        },
-        responseType: "text",
-      }
-    );
-
-    let fullResponse = "";
-    const reader = response.data.split("\n");
-    for (const line of reader) {
-      if (line.startsWith("data: ")) {
-        const data = line.slice(6);
-        if (data === "[DONE]") {
-          break;
-        }
-        try {
-          const parsed = JSON.parse(data);
-          const content = parsed.choices[0].delta.content;
-          if (content) {
-            fullResponse += content;
-            pendingGPTResponse.value = fullResponse;
-            await typeResponse(content);
-          }
-        } catch (error) {
-          console.error("Error parsing stream message:", error);
-        }
-      }
-    }
-    return fullResponse;
-  } catch (error) {
-    console.error("GPT API 호출 중 오류 발생:", error);
-    throw new Error("GPT 응답을 가져오는 데 실패했습니다.");
-  }
-};
-
-const typeResponse = async (text: string) => {
-  isTyping.value = true;
-  for (let i = 0; i < text.length; i++) {
-    typedResponse.value += text[i];
-    await new Promise((resolve) => setTimeout(resolve, 15));
-  }
-};
-
-const handleSendMessage = async (message: string) => {
-  if (message !== "") {
-    const userMessage: MessageType = {
-      id: `user-${uuidv4()}`,
-      content: message,
-      timestamp: new Date().toISOString(),
-    };
-
-    try {
-      let currentChatID = chatID.value;
-
-      // 사용자 메시지를 즉시 로컬 상태에 추가
-      currentChatMessages.value.push(userMessage);
-
-      // GPT API 호출 준비
-      isWaitingForResponse.value = true;
-      pendingGPTResponse.value = "";
-      typedResponse.value = "";
-
-      if (!currentChatID) {
-        const newChat: ChatType = {
-          id: uuidv4(),
-          title: userMessage.content.slice(0, 20) + "...",
-          messages: [userMessage],
-        };
-        await addChat(newChat);
-        currentChatID = newChat.id;
-        chatID.value = currentChatID;
-
-        router.push({ path: `home/chat/${currentChatID}` });
-      } else {
-        await addMessage({ chatID: currentChatID, message: userMessage });
-      }
-
-      // GPT API 호출
-      const gptResponse = await callGPTAPI(userMessage.content);
-
-      const gptMessage: MessageType = {
-        id: `gpt-${uuidv4()}`,
-        content: gptResponse,
-        timestamp: new Date().toISOString(),
-      };
-
-      await addMessage({ chatID: currentChatID, message: gptMessage });
-
-      // GPT 응답을 즉시 로컬 상태에 추가
-      currentChatMessages.value.push(gptMessage);
-
-      // GPT 응답 후에 채팅 목록을 새로고침
-      await refetchSelectedChat();
-      emit("refetch-chat-list");
-    } catch (error) {
-      console.error("메시지 전송 또는 GPT 응답 처리 중 오류 발생:", error);
-      // TODO: 사용자에게 오류 메시지 표시
-    } finally {
-      isWaitingForResponse.value = false;
-      pendingGPTResponse.value = "";
-      isTyping.value = false;
-      typedResponse.value = "";
-    }
-  }
-};
-
-watchEffect(() => {
-  if (selectedChatData.value) {
-    currentChatMessages.value = [...selectedChatData.value.messages];
-  } else {
-    currentChatMessages.value = [];
-  }
-});
-
-const messageContainer = ref<HTMLElement | null>(null);
-
-const scrollToBottom = () => {
-  if (messageContainer.value) {
-    messageContainer.value.scrollTop = messageContainer.value.scrollHeight;
-  }
-};
-
-// 컴포넌트가 마운트될 때 스크롤
-onMounted(() => {
-  nextTick(() => {
-    scrollToBottom();
-  });
-});
-
-// 메시지가 변경될 때 스크롤
-watch(currentChatMessages, () => {
-  nextTick(() => {
-    scrollToBottom();
-  });
-});
-
-// 타이핑 응답이 업데이트될 때 스크롤
-watch(typedResponse, () => {
-  nextTick(() => {
-    scrollToBottom();
-  });
-});
+  isAddingChat,
+  isAddingMessage,
+  isWaitingForResponse,
+  pendingGPTResponse,
+  isTyping,
+  typedResponse,
+  currentChatMessages,
+  currentChatWithPendingResponse,
+  handleSendMessage,
+  messageContainer,
+  isMobile,
+} = useChat();
 </script>
 
 <template>

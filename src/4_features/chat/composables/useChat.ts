@@ -1,4 +1,4 @@
-import { computed, ref, watchEffect, onMounted, nextTick } from "vue";
+import { computed, ref, watchEffect, onMounted, nextTick, watch } from "vue";
 import {
   useAddChatMutation,
   useAddMessageMutation,
