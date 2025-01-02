@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { defineEmits } from "vue";
 import InputMessage from "@/6_shared/ui/InputMessage.vue";
 import { useChat } from "@/4_features/chat/composables/useChat";
-
-const emit = defineEmits<{
-  (e: "refetch-chat-list"): void;
-}>();
 
 const {
   chatID,
@@ -100,7 +95,7 @@ const {
 
 <style scoped>
 .overflow-y-auto {
-  max-height: calc(100vh - 180px);
+  @apply max-h-[calc(100vh-180px)];
   scrollbar-width: thin;
   scrollbar-color: rgba(155, 155, 155, 0.5) transparent;
 }
@@ -120,7 +115,7 @@ const {
 
 @media (max-width: 640px) {
   .overflow-y-auto {
-    max-height: calc(100vh - 130px);
+    @apply max-h-[calc(100vh-130px)];
   }
 }
 </style>
