@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { SideBar } from "@/3_widgets/navigation";
 import { useChatQuery } from "@/4_features/chat/api/query";
-import { ref, watch, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { Bars3Icon } from "@heroicons/vue/24/solid";
 import { useResponsive } from "@/6_shared/composables/useResponsive";
@@ -31,18 +31,7 @@ const handleDeleteChat = async (chatId: string) => {
   }
 };
 
-// watch(chatData, () => {
-//   if (
-//     selectedChatID.value === undefined &&
-//     chatData.value &&
-//     chatData.value.length > 0
-//   ) {
-//     selectedChatID.value = chatData.value[0].id;
-//   }
-// });
-
 const { isMobile, isTablet } = useResponsive();
-
 const isSidebarOpen = ref(!isMobile.value && !isTablet.value);
 
 const lgMediaQuery = window.matchMedia("(min-width: 1280px)");
@@ -106,11 +95,7 @@ const closeSidebar = () => {
         isMobile ? '' : isTablet ? 'ml-0' : 'ml-72',
       ]"
     >
-      <router-view
-        :key="$route.fullPath"
-        v-model:chatID="selectedChatID"
-        @refetch-chat-list="refreshChatList"
-      />
+      <router-view></router-view>
     </main>
 
     <!-- 오버레이 (모바일 및 태블릿에서 사이드바가 열렸을 때) -->
