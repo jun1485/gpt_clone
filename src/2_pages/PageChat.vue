@@ -20,7 +20,7 @@ watch(
 
 <template>
   <div class="flex flex-col gap-3 w-full h-full justify-between">
-    <ChatContents :chatID="chatID" />
+    <ChatContents :chatID="chatID" @refetch-chat-list="fetchSelectedChatData" />
   </div>
 </template>
 

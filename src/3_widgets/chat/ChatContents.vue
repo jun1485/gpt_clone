@@ -1,25 +1,30 @@
 <script setup lang="ts">
 import InputMessage from "@/6_shared/ui/InputMessage.vue";
 import { useChat } from "@/4_features/chat/composables/useChat";
+import { ref } from "vue";
+
+const props = defineProps<{
+  chatID: string | null;
+}>();
+
+const emit = defineEmits<{
+  (e: "refetch-chat-list"): void;
+}>();
+
+const chatIDRef = ref(props.chatID);
 
 const {
-  chatID,
-  selectedChatData,
-  refetchSelectedChat,
   isLoading,
   error,
   isAddingChat,
   isAddingMessage,
   isWaitingForResponse,
-  pendingGPTResponse,
   isTyping,
-  typedResponse,
-  currentChatMessages,
   currentChatWithPendingResponse,
   handleSendMessage,
   messageContainer,
   isMobile,
-} = useChat();
+} = useChat(chatIDRef);
 </script>
 
 <template>
