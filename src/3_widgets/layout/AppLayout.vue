@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { SideBar } from "@/3_widgets/navigation";
 import { useChatQuery } from "@/4_features/chat/api/query";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { Bars3Icon } from "@heroicons/vue/24/solid";
 import { useResponsive } from "@/6_shared/composables/useResponsive";
+import { useMediaQuery } from "@vueuse/core";
 
 const router = useRouter();
 const { data: chatData, refetch: refetchChatData } = useChatQuery();
@@ -32,22 +33,12 @@ const handleDeleteChat = async (chatId: string) => {
 };
 
 const { isMobile, isTablet } = useResponsive();
+
+const lgMatches = useMediaQuery("(min-width: 1280px)");
 const isSidebarOpen = ref(!isMobile.value && !isTablet.value);
 
-const lgMediaQuery = window.matchMedia("(min-width: 1280px)");
-
-// 미디어쿼리 변경 감지 핸들러
-const handleResize = (e: MediaQueryListEvent | MediaQueryList) => {
-  isSidebarOpen.value = e.matches;
-};
-
-onMounted(() => {
-  handleResize(lgMediaQuery);
-  lgMediaQuery.addEventListener("change", handleResize);
-});
-
-onUnmounted(() => {
-  lgMediaQuery.removeEventListener("change", handleResize);
+watch(lgMatches, (newVal) => {
+  isSidebarOpen.value = newVal;
 });
 
 const toggleSidebar = () => {
