@@ -5,7 +5,7 @@ export function useResponsive() {
   const { width } = useWindowSize();
 
   const isMobile = computed(() => width.value < 680);
-  const isTablet = computed(() => width.value < 1280);
+  const isTablet = computed(() => width.value >= 680 && width.value < 1280);
   const isDesktop = computed(() => width.value >= 1280);
 
   return {
