@@ -7,25 +7,37 @@ export function useAuth() {
   const isAuthenticated = ref(false);
   const userId = ref<string | null>(null);
   const isLoading = ref(true);
+  const error = ref<string | null>(null);
 
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    user.value = currentUser;
-    isAuthenticated.value = !!currentUser;
-    userId.value = currentUser ? currentUser.uid : null;
-    isLoading.value = false;
-  });
+  const unsubscribe = onAuthStateChanged(
+    auth,
+    (currentUser) => {
+      user.value = currentUser;
+      isAuthenticated.value = !!currentUser;
+      userId.value = currentUser ? currentUser.uid : null;
+      isLoading.value = false;
+      error.value = null;
+    },
+    (err) => {
+      error.value = err.message;
+      isLoading.value = false;
+    }
+  );
+
+  const logout = async () => {
+    try {
+      isLoading.value = true;
+      await signOut(auth);
+    } catch (err) {
+      console.error("로그아웃 중 오류 발생:", err);
+    } finally {
+      isLoading.value = false;
+    }
+  };
 
   onUnmounted(() => {
     unsubscribe();
   });
 
-  const logout = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error("로그아웃 중 오류 발생:", error);
-    }
-  };
-
-  return { user, isAuthenticated, userId, isLoading, logout };
+  return { user, isAuthenticated, userId, isLoading, logout, error };
 }
