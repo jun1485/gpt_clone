@@ -1,5 +1,14 @@
+export enum GPTErrorCode {
+  CONFIG_MISSING = "CONFIG_MISSING",
+  API_ERROR = "API_ERROR",
+  EMPTY_RESPONSE = "EMPTY_RESPONSE",
+  NETWORK_ERROR = "NETWORK_ERROR",
+  PARSE_ERROR = "PARSE_ERROR",
+  UNEXPECTED_ERROR = "UNEXPECTED_ERROR",
+}
+
 export class GPTError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(message: string, public code?: GPTErrorCode) {
     super(message);
     this.name = "GPTError";
   }
@@ -10,7 +19,10 @@ export async function callGPTAPI(message: string): Promise<string> {
   const API_URL = import.meta.env.VITE_OPENAI_API_URL;
 
   if (!API_URL || !API_KEY) {
-    throw new GPTError("API 설정이 누락되었습니다.", "CONFIG_MISSING");
+    throw new GPTError(
+      "API 설정이 누락되었습니다.",
+      GPTErrorCode.CONFIG_MISSING
+    );
   }
 
   try {
@@ -28,11 +40,17 @@ export async function callGPTAPI(message: string): Promise<string> {
     });
 
     if (!response.ok) {
-      throw new GPTError(`API 응답 오류: ${response.status}`, "API_ERROR");
+      throw new GPTError(
+        `API 응답 오류: ${response.status}`,
+        GPTErrorCode.API_ERROR
+      );
     }
 
     if (!response.body) {
-      throw new GPTError("응답 본문이 비어있습니다.", "EMPTY_RESPONSE");
+      throw new GPTError(
+        "응답 본문이 비어있습니다.",
+        GPTErrorCode.EMPTY_RESPONSE
+      );
     }
 
     const reader = response.body.getReader();
@@ -65,6 +83,9 @@ export async function callGPTAPI(message: string): Promise<string> {
     return fullResponse || "응답을 생성할 수 없습니다.";
   } catch (error) {
     if (error instanceof GPTError) throw error;
-    throw new GPTError("예기치 않은 오류가 발생했습니다.", "UNEXPECTED_ERROR");
+    throw new GPTError(
+      "예기치 않은 오류가 발생했습니다.",
+      GPTErrorCode.UNEXPECTED_ERROR
+    );
   }
 }
